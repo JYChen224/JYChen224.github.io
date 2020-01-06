@@ -114,7 +114,7 @@
 <li>步长参数不容易确定</li>
 </ul>
 <p>尤其当算法采用不合适的步长时，参数会更新到一个不好的策略，从而采集到的更差的样本，估计出更差的梯度，更新到更更不好的策略，如此循环，使得策略没办法提升。TRPO方法在进行梯度下降的同时，对步长加以限制，并可以自动的调整步长，在理论上确保策略的提升是非减的，这样每次策略更新的时候我们都能有信心新的策略比旧的策略要好。</p>
-<h3 id="回报函数与优势函数"><a href="#回报函数与优势函数" class="headerlink" title="回报函数与优势函数"></a>回报函数与优势函数</h3><p>我们用$\pi$来表示策略，用$\eta(\pi)$来表示策略的回报函数，即期望折扣回报：</p>
+<h3 id="回报函数与优势函数"><a href="#回报函数与优势函数" class="headerlink" title="回报函数与优势函数"></a>回报函数与优势函数</h3><p>我们用$ \pi $来表示策略，用$\eta(\pi)$来表示策略的回报函数，即期望折扣回报：</p>
 <script type="math/tex; mode=display">\eta(\pi)=E_{s_0,a_0,\dots}\left[\sum_{t=0}^{\infty}\gamma^tr(s_t)\right]\quad\quad(1)</script><p>其中$s_{0} \sim \rho_{0}\left(s_{0}\right), a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)$。</p>
 <p>然后我们定义优势函数$A_\pi(s,a)$:</p>
 <script type="math/tex; mode=display">
@@ -171,7 +171,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)</script><p>其中$a_{t} \sim
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/TRPO/" data-id="ck52iytlz000140ux2632f226" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/TRPO/" data-id="ck52j8r3o0001houxatafazw6" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -237,7 +237,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)</script><p>其中$a_{t} \sim
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/DDPG/" data-id="ck52iytlg000040ux1g7g2pm1" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/DDPG/" data-id="ck52j8r430007houxe6pdfiu2" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -339,7 +339,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)</script><p>其中$a_{t} \sim
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W7/" data-id="ck52iytmj000640ux2ajga0rr" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W7/" data-id="ck52j8r3z0005houxesnxb9ok" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -431,7 +431,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W6/" data-id="ck52iytmk000740uxgnq84vy7" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W6/" data-id="ck52j8r410006houx9lbe1b9p" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -616,7 +616,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W4/" data-id="ck52iytm8000540uxclpu5u1z" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W4/" data-id="ck52j8r3v0004houxb54udqqw" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -732,7 +732,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W3/" data-id="ck52iytm5000240ux3d3q32cl" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W3/" data-id="ck52j8r3q0002houxd3r39yyt" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -836,7 +836,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W2/" data-id="ck52iytm7000440ux44kb00ti" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W2/" data-id="ck52j8r3s0003houx8wjv18yc" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -979,7 +979,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="http://yoursite.com/2020/01/06/W1/" data-id="ck52iytm6000340ux87aj6ywb" class="article-share-link">分享到</a>
+        <a data-url="http://yoursite.com/2020/01/06/W1/" data-id="ck52j8r310000houxejt2fsfx" class="article-share-link">分享到</a>
         
       </div>
     </footer>
