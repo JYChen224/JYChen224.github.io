@@ -22,7 +22,7 @@
     hostname: new URL('http://yoursite.com').hostname,
     root: '/',
     scheme: 'Muse',
-    version: '7.6.0',
+    version: '7.7.0',
     exturl: false,
     sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":null},
@@ -32,6 +32,7 @@
     mediumzoom: false,
     lazyload: false,
     pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
     algolia: {
       appID: '',
       apiKey: '',
@@ -63,9 +64,7 @@
   CONFIG.page = {
     sidebar: "",
     isHome: true,
-    isPost: false,
-    isPage: false,
-    isArchive: false
+    isPost: false
   };
 </script>
 
@@ -1181,7 +1180,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-08 16:50:59" itemprop="dateModified" datetime="2020-01-08T16:50:59+08:00">2020-01-08</time>
+                <time title="修改时间：2020-01-08 16:52:18" itemprop="dateModified" datetime="2020-01-08T16:52:18+08:00">2020-01-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1206,76 +1205,64 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="trpo-trustregionpolicyoptimization">TRPO-Trust Region Policy Optimization</h1>
-<h3 id="背景">背景</h3>
-<p>在策略梯度算法中，参数更新的表达式为： <span class="math display">\[\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J\]</span> 在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
+          <h1 id="TRPO-Trust-Region-Policy-Optimization"><a href="#TRPO-Trust-Region-Policy-Optimization" class="headerlink" title="TRPO-Trust Region Policy Optimization"></a>TRPO-Trust Region Policy Optimization</h1><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>在策略梯度算法中，参数更新的表达式为：</p>
+<script type="math/tex; mode=display">\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J</script><p>在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
 <ul>
 <li>梯度估计不准确</li>
 <li>步长参数不容易确定</li>
 </ul>
 <p>尤其当算法采用不合适的步长时，参数会更新到一个不好的策略，从而采集到的更差的样本，估计出更差的梯度，更新到更更不好的策略，如此循环，使得策略没办法提升。TRPO方法在进行梯度下降的同时，对步长加以限制，并可以自动的调整步长，在理论上确保策略的提升是非减的，这样每次策略更新的时候我们都能有信心新的策略比旧的策略要好。</p>
-<h3 id="回报函数与优势函数">回报函数与优势函数</h3>
-<p>我们 <span class="math inline">\(123\)</span> 用<span class="math inline">\(\pi\)</span>来表示策略，用<span class="math inline">\(\eta(\pi)\)</span>来表示策略的回报函数，即期望折扣回报： <span class="math display">\[\eta(\pi)=E_{s_0,a_0,\dots}\left[\sum_{t=0}^{\infty}\gamma^tr(s_t)\right]\quad\quad(1)\]</span> 其中<span class="math inline">\(s_{0} \sim \rho_{0}\left(s_{0}\right), a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。</p>
-<p>然后我们定义优势函数<span class="math inline">\(A_\pi(s,a)\)</span>: <span class="math display">\[
-Q_{\pi}\left(s_{t}, a_{t}\right)=\mathbb{E}_{s_{t+1}, a_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
-\]</span> <span class="math display">\[
-V_{\pi}\left(s_{t}\right)=\mathbb{E}_{a_{t}, s_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
-\]</span> <span class="math display">\[
-A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
-\]</span> 其中<span class="math inline">\(a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。 优势函数描述了动作值函数与状态值函数之间的差异，相当于Q_Learning中的<span class="math inline">\(\delta\)</span>，后面可以看到，使用优势函数可以描述两个策略之间回报函数的差异。</p>
-<h3 id="回报函数的分解">回报函数的分解</h3>
-<p><span class="math display">\[
-\eta(\tilde{\pi})=\eta(\pi)+\mathbb{E}_{s_{0}, a_{0}, \cdots \sim \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]\quad\quad(3)
-\]</span> 证明： <span class="math display">\[ \begin{aligned}
-&amp; \mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]
-\\&amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t}\left(r\left(s_{t}\right)+\gamma V_{\pi}\left(s_{t+1}\right)-V_{\pi}\left(s_{t}\right)\right)\right]
-\\ &amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[-V_{\pi}\left(s_{0}\right)+\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
-\\ &amp;=-\mathbb{E}_{s_{0}}\left[V_{\pi}\left(s_{0}\right)\right]+\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
-\\ &amp;=-\eta(\pi)+\eta(\tilde{\pi})
-\end{aligned}
-\]</span></p>
-<p>公式的第二行是优势函数的展开表达，第三行是通过错位相消化简了<span class="math inline">\(V_{\pi}\left(s\right)\)</span>,第五行是根据回报函数的定义得到，这里注意到状态值函数与回报函数存在关系：<span class="math inline">\(\eta(\pi)=E_{s_0}\left[V_{\pi}\left(s_{0}\right)\right]\)</span></p>
-<p>我们将公式（3）进行进一步的化简： <span class="math display">\[\begin{aligned} \eta(\tilde{\pi}) &amp;=\eta(\pi)+\sum_{t=0}^{\infty} \sum_{s} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) \gamma^{t} A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \sum_{t=0}^{\infty} \gamma^{t} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \rho_{\tilde{\pi}}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \end{aligned}\]</span> 其中<span class="math inline">\(\rho_{\pi}(s)=P\left(s_{0}=s\right)+\gamma P\left(s_{1}=s\right)+\gamma^{2} P\left(s_{2}=s\right)+\ldots\)</span>，表示折扣访问频率，可以理解为在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。</p>
-<p>从公式可以看出，在从一个策略优化到新的策略的时候，只要保证每个状态<span class="math inline">\(S\)</span>下，保持一个非负的advantage，即<span class="math inline">\(\sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)&gt;0\)</span>，则可以保证新的策略肯定是更好的，这样通过迭代算法可以收敛到最优的策略。</p>
-<h3 id="回报函数的近似">回报函数的近似</h3>
-<p><span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>描述了在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。此时状态s的分布由新的策略产生，对新的策略严重依赖，使得优化问题非常复杂，因此TRPO采用<span class="math inline">\(\rho_{\pi}(s)\)</span>对<span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>进行近似，从而得到新的目标函数： <span class="math display">\[L_{\pi}(\tilde{\pi})=\eta(\pi)+\sum_{s} \rho_{\pi}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)\quad\quad(4)\]</span></p>
-<p>近似目标函数与原函数之间存在如下关系： <span class="math display">\[
-\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) \\\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} &amp;=\left.\nabla_{\theta} \eta\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} \end{aligned}
-\]</span> 即<span class="math inline">\(L_{\pi}(\tilde{\pi})\)</span>是对<span class="math inline">\(\eta(\tilde{\pi})\)</span>的一阶等价近似，证明如下：</p>
-<p>对于第一个等式 <span class="math display">\[
-\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) + \sum_{s} \rho_{\pi_{\theta_{0}}}(s) \sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a) \\ \end{aligned}
-\]</span> 由于同一个策略对自身优势函数的期望为零，<span class="math inline">\(\sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a)=0\)</span>，因此第一个等式成立。</p>
-<p>对于第二个等式 <span class="math display">\[\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} =\sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
-<p><span class="math display">\[\nabla_{\theta} \eta\left(\pi_{\theta}\right)|_{\theta=\theta_{0}} = \sum_{s} \nabla_{\theta}\rho_{\pi}(s) \sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} + \sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
-<p>由于<span class="math inline">\(\sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}=0\)</span>，因此第二个等式成立。</p>
-<p>进一步，当策略更新满足如<span class="math inline">\(\pi_{\text {new }}(a | s)=(1-\alpha) \pi_{\text {old }}(a | s)+\alpha \pi^{\prime}(a | s)\)</span>时，近似函数与原目标函数存在如下关系： <span class="math display">\[
-\eta\left(\pi_{\text {new }}\right) \geq L_{\pi_{\text {old }}}\left(\pi_{\text {new }}\right)-\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \alpha^{2}
-\]</span> 或者用KL散度表示为： <span class="math display">\[
-\begin{aligned} \eta(\tilde{\pi}) &amp; \geq L_{\pi}(\tilde{\pi})-C D_{\mathrm{KL}}^{\max }(\pi, \tilde{\pi})  \\ &amp; \text { where } C=\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \end{aligned}   \quad\quad\quad\quad (5)
-\]</span></p>
-<p>公式(5)提供了<span class="math inline">\(\eta(\tilde{\pi})\)</span>的下界，我们令<span class="math inline">\(M_i(\pi)=L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>，则有： <span class="math display">\[
-\begin{array}{l}{\eta\left(\pi_{i+1}\right) \geq M_{i}\left(\pi_{i+1}\right)} \\ {\eta\left(\pi_{i}\right)=M_{i}\left(\pi_{i}\right)} \\ {\eta\left(\pi_{i+1}\right)-\eta\left(\pi_{i}\right) \geq M_{i}\left(\pi_{i+1}\right)-M\left(\pi_{i}\right)}\end{array}
-\]</span> 只要每次选择策略使得<span class="math inline">\(M_i&gt;0\)</span>，则这样的策略就是更好的策略，算法就可以收敛到最优策略。</p>
-<h3 id="优化问题的简化">优化问题的简化</h3>
-<p>从过前面的分析，我们把求解回报函数<span class="math inline">\(\eta(\pi)\)</span>最大的问题，转化为求<span class="math inline">\(\eta(\pi)\)</span>的下界函数<span class="math inline">\(L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>最大的问题，形式化为： <span class="math display">\[
-\underset{\theta}{\operatorname{maximize}}\left[L_{\theta_{\mathrm{old}}}(\theta)-C D_{\mathrm{KL}}^{\max }\left(\theta_{\mathrm{old}}, \theta\right)\right]
-\]</span> 这个优化可以看做是在目标函数<span class="math inline">\(L\)</span>的基础上，增加了一个惩罚项，即在最大化<span class="math inline">\(L\)</span>的基础上，限制每次优化的参数变化程度，其中<span class="math inline">\(C\)</span>为惩罚因子，KL散度表示参数之间的距离。但如果固定惩罚因子<span class="math inline">\(C\)</span>，则每次迭代的步长很小，因此希望自动调整<span class="math inline">\(C\)</span>的取值，这样优化问题可以转化为带约束优化的形式： <span class="math display">\[
-\begin{array}{l}{\underset{\theta}{\operatorname{maximize}} L_{\theta_{\text {old }}}(\theta)} \\ {\text { subject to } \bar{D}_{\mathrm{KL}}^{\rho_{\theta_{\text {old }}}}\left(\theta_{\text {old }}, \theta\right) \leq \delta}\end{array} \quad\quad\quad\quad (6)
-\]</span></p>
-<p>进一步，我们将目标函数一阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行一阶泰勒展开： <span class="math display">\[L_{\theta_{\text {old }}}(\theta)\doteq \left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)
-\]</span> 将约束条件进行二阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行二阶泰勒展开 <span class="math display">\[
+<h3 id="回报函数与优势函数"><a href="#回报函数与优势函数" class="headerlink" title="回报函数与优势函数"></a>回报函数与优势函数</h3><p>我们用$\pi$来表示策略，用$\eta(\pi)$来表示策略的回报函数，即期望折扣回报：</p>
+<script type="math/tex; mode=display">\eta(\pi)=E_{s_0,a_0,\dots}\left[\sum_{t=0}^{\infty}\gamma^tr(s_t)\right]\quad\quad(1)</script><p>其中$s_{0} \sim \rho_{0}\left(s_{0}\right), a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)$。</p>
+<p>然后我们定义优势函数$A_\pi(s,a)$:</p>
+<script type="math/tex; mode=display">
+Q_{\pi}\left(s_{t}, a_{t}\right)=\mathbb{E}_{s_{t+1}, a_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]</script><script type="math/tex; mode=display">
+V_{\pi}\left(s_{t}\right)=\mathbb{E}_{a_{t}, s_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]</script><script type="math/tex; mode=display">
+A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)</script><p>其中$a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)$。<br>优势函数描述了动作值函数与状态值函数之间的差异，相当于Q_Learning中的$\delta$，后面可以看到，使用优势函数可以描述两个策略之间回报函数的差异。</p>
+<h3 id="回报函数的分解"><a href="#回报函数的分解" class="headerlink" title="回报函数的分解"></a>回报函数的分解</h3><script type="math/tex; mode=display">
+\eta(\tilde{\pi})=\eta(\pi)+\mathbb{E}_{s_{0}, a_{0}, \cdots \sim \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]\quad\quad(3)</script><p>证明：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+& \mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]
+\\&=\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t}\left(r\left(s_{t}\right)+\gamma V_{\pi}\left(s_{t+1}\right)-V_{\pi}\left(s_{t}\right)\right)\right]
+\\ &=\mathbb{E}_{\tau | \tilde{\pi}}\left[-V_{\pi}\left(s_{0}\right)+\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
+\\ &=-\mathbb{E}_{s_{0}}\left[V_{\pi}\left(s_{0}\right)\right]+\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
+\\ &=-\eta(\pi)+\eta(\tilde{\pi})
+\end{aligned}</script><p>公式的第二行是优势函数的展开表达，第三行是通过错位相消化简了$V_{\pi}\left(s\right)$,第五行是根据回报函数的定义得到，这里注意到状态值函数与回报函数存在关系：$\eta(\pi)=E_{s_0}\left[V_{\pi}\left(s_{0}\right)\right]$</p>
+<p>我们将公式（3）进行进一步的化简：</p>
+<script type="math/tex; mode=display">\begin{aligned} \eta(\tilde{\pi}) &=\eta(\pi)+\sum_{t=0}^{\infty} \sum_{s} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) \gamma^{t} A_{\pi}(s, a) \\ &=\eta(\pi)+\sum_{s} \sum_{t=0}^{\infty} \gamma^{t} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \\ &=\eta(\pi)+\sum_{s} \rho_{\tilde{\pi}}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \end{aligned}</script><p>其中$\rho_{\pi}(s)=P\left(s_{0}=s\right)+\gamma P\left(s_{1}=s\right)+\gamma^{2} P\left(s_{2}=s\right)+\ldots$，表示折扣访问频率，可以理解为在策略$\tilde{\pi}$下，状态的分布。</p>
+<p>从公式可以看出，在从一个策略优化到新的策略的时候，只要保证每个状态$S$下，保持一个非负的advantage，即$\sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)&gt;0$，则可以保证新的策略肯定是更好的，这样通过迭代算法可以收敛到最优的策略。</p>
+<h3 id="回报函数的近似"><a href="#回报函数的近似" class="headerlink" title="回报函数的近似"></a>回报函数的近似</h3><p>$\rho_{\tilde{\pi}}(s)$描述了在策略$\tilde{\pi}$下，状态的分布。此时状态s的分布由新的策略产生，对新的策略严重依赖，使得优化问题非常复杂，因此TRPO采用$\rho_{\pi}(s)$对$\rho_{\tilde{\pi}}(s)$进行近似，从而得到新的目标函数：</p>
+<script type="math/tex; mode=display">L_{\pi}(\tilde{\pi})=\eta(\pi)+\sum_{s} \rho_{\pi}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)\quad\quad(4)</script><p>近似目标函数与原函数之间存在如下关系：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &=\eta\left(\pi_{\theta_{0}}\right) \\\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} &=\left.\nabla_{\theta} \eta\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} \end{aligned}</script><p>即$L_{\pi}(\tilde{\pi})$是对$\eta(\tilde{\pi})$的一阶等价近似，证明如下：</p>
+<p>对于第一个等式</p>
+<script type="math/tex; mode=display">
+\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &=\eta\left(\pi_{\theta_{0}}\right) + \sum_{s} \rho_{\pi_{\theta_{0}}}(s) \sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a) \\ \end{aligned}</script><p>由于同一个策略对自身优势函数的期望为零，$\sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a)=0$，因此第一个等式成立。</p>
+<p>对于第二个等式</p>
+<script type="math/tex; mode=display">\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} =\sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}</script><script type="math/tex; mode=display">\nabla_{\theta} \eta\left(\pi_{\theta}\right)|_{\theta=\theta_{0}} = \sum_{s} \nabla_{\theta}\rho_{\pi}(s) \sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} + \sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}</script><p>由于$\sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}=0$，因此第二个等式成立。</p>
+<p>进一步，当策略更新满足如$\pi_{\text {new }}(a | s)=(1-\alpha) \pi_{\text {old }}(a | s)+\alpha \pi^{\prime}(a | s)$时，近似函数与原目标函数存在如下关系：</p>
+<script type="math/tex; mode=display">
+\eta\left(\pi_{\text {new }}\right) \geq L_{\pi_{\text {old }}}\left(\pi_{\text {new }}\right)-\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \alpha^{2}</script><p>或者用KL散度表示为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \eta(\tilde{\pi}) & \geq L_{\pi}(\tilde{\pi})-C D_{\mathrm{KL}}^{\max }(\pi, \tilde{\pi})  \\ & \text { where } C=\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \end{aligned}   \quad\quad\quad\quad (5)</script><p>公式(5)提供了$\eta(\tilde{\pi})$的下界，我们令$M_i(\pi)=L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)$，则有：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\eta\left(\pi_{i+1}\right) \geq M_{i}\left(\pi_{i+1}\right)} \\ {\eta\left(\pi_{i}\right)=M_{i}\left(\pi_{i}\right)} \\ {\eta\left(\pi_{i+1}\right)-\eta\left(\pi_{i}\right) \geq M_{i}\left(\pi_{i+1}\right)-M\left(\pi_{i}\right)}\end{array}</script><p>只要每次选择策略使得$M_i&gt;0$，则这样的策略就是更好的策略，算法就可以收敛到最优策略。</p>
+<h3 id="优化问题的简化"><a href="#优化问题的简化" class="headerlink" title="优化问题的简化"></a>优化问题的简化</h3><p>从过前面的分析，我们把求解回报函数$\eta(\pi)$最大的问题，转化为求$\eta(\pi)$的下界函数$L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)$最大的问题，形式化为：</p>
+<script type="math/tex; mode=display">
+\underset{\theta}{\operatorname{maximize}}\left[L_{\theta_{\mathrm{old}}}(\theta)-C D_{\mathrm{KL}}^{\max }\left(\theta_{\mathrm{old}}, \theta\right)\right]</script><p>这个优化可以看做是在目标函数$L$的基础上，增加了一个惩罚项，即在最大化$L$的基础上，限制每次优化的参数变化程度，其中$C$为惩罚因子，KL散度表示参数之间的距离。但如果固定惩罚因子$C$，则每次迭代的步长很小，因此希望自动调整$C$的取值，这样优化问题可以转化为带约束优化的形式：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\underset{\theta}{\operatorname{maximize}} L_{\theta_{\text {old }}}(\theta)} \\ {\text { subject to } \bar{D}_{\mathrm{KL}}^{\rho_{\theta_{\text {old }}}}\left(\theta_{\text {old }}, \theta\right) \leq \delta}\end{array} \quad\quad\quad\quad (6)</script><p>进一步，我们将目标函数一阶逼近，在$\theta_{\text {old }}$进行一阶泰勒展开：</p>
+<script type="math/tex; mode=display">L_{\theta_{\text {old }}}(\theta)\doteq \left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)</script><p>将约束条件进行二阶逼近，在$\theta_{\text {old }}$进行二阶泰勒展开</p>
+<script type="math/tex; mode=display">
 \begin{aligned}
-&amp; D_{KL}(\pi_{\theta_{old}}(\cdot|s)||\pi_{\theta}(\cdot|s)) \\
-&amp; = E_{x\sim\pi_{old}}log\pi_{\theta_{old}} - E_{x\sim\pi_{old}}log\pi_{\theta} \\
-&amp; \approx E_{\theta_{old}}[log\pi_{\theta_{old}}] - (E_{\theta_{old}}[log\pi_{\theta_{old}}] + E_{\theta_{old}}[\nabla log\pi_{\theta_{old}}]\Delta\theta+\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta)\\
-&amp; = -\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta
-\end{aligned}
-\]</span> 其中最后一步的等式由于<span class="math inline">\(log\pi_{\theta_{old}}\)</span>为极点，<span class="math inline">\(\nabla log\pi_{\theta_{old}}=0\)</span>。</p>
-<p>令<span class="math inline">\(A = E_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\)</span>，则优化问题最终可描述为： <span class="math display">\[
-\begin{array}{l}{\underset{\theta}{\operatorname{maximize}}\left[\left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)\right]} \\ {\text { subject to } \frac{1}{2}\left(\theta_{\text {old }}-\theta\right)^{T} A\left(\theta_{\text {old }}\right)\left(\theta_{\text {old }}-\theta\right) \leq \delta}\end{array}
-\]</span></p>
-<h3 id="小结">小结</h3>
-<p>在梯度上升法中，我们判断最陡峭的方向，之后朝着那个方向前进。但是如果学习率太高的话，这样的优化也许会远离真正的最优策略。在TRPO中，我们用 δ 变量来限制我们的搜索区域，这样的区域可以保证在它达到局部或者全局最优策略之前，它的优化策略将会优于当前策略，从而使算法稳定的收敛到一个最优策略。</p>
+& D_{KL}(\pi_{\theta_{old}}(\cdot|s)||\pi_{\theta}(\cdot|s)) \\
+& = E_{x\sim\pi_{old}}log\pi_{\theta_{old}} - E_{x\sim\pi_{old}}log\pi_{\theta} \\
+& \approx E_{\theta_{old}}[log\pi_{\theta_{old}}] - (E_{\theta_{old}}[log\pi_{\theta_{old}}] + E_{\theta_{old}}[\nabla log\pi_{\theta_{old}}]\Delta\theta+\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta)\\
+& = -\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta
+\end{aligned}</script><p>其中最后一步的等式由于$log\pi_{\theta_{old}}$为极点，$\nabla log\pi_{\theta_{old}}=0$。</p>
+<p>令$A = E_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]$，则优化问题最终可描述为：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\underset{\theta}{\operatorname{maximize}}\left[\left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)\right]} \\ {\text { subject to } \frac{1}{2}\left(\theta_{\text {old }}-\theta\right)^{T} A\left(\theta_{\text {old }}\right)\left(\theta_{\text {old }}-\theta\right) \leq \delta}\end{array}</script><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在梯度上升法中，我们判断最陡峭的方向，之后朝着那个方向前进。但是如果学习率太高的话，这样的优化也许会远离真正的最优策略。在TRPO中，我们用 δ 变量来限制我们的搜索区域，这样的区域可以保证在它达到局部或者全局最优策略之前，它的优化策略将会优于当前策略，从而使算法稳定的收敛到一个最优策略。</p>
 
       
     </div>
@@ -1299,6 +1286,28 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
 
           </div>
           
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
 
         </div>
           
@@ -1379,7 +1388,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.1.1
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.6.0
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.0
   </div>
 
         
@@ -1391,7 +1400,6 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
 
 
 
-        
       </div>
     </footer>
   </div>
@@ -1430,60 +1438,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
 
 
 
-
   
-
-  
-      
-<script type="text/x-mathjax-config">
-    MathJax.Ajax.config.path['mhchem'] = '//cdn.jsdelivr.net/npm/mathjax-mhchem@3';
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-        extensions: ['[mhchem]/mhchem.js'],
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') {
-          next = next.nextSibling;
-        }
-        if (next && next.nodeName.toLowerCase() === 'br') {
-          next.parentNode.removeChild(next);
-        }
-      }
-    });
-  });
-
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
-      if (element.nodeName.toLowerCase() == 'li') {
-        element = element.parentNode;
-      }
-      element.classList.add('has-jax');
-    }
-  });
-</script>
-<script>
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
-    MathJax.Hub.Typeset();
-  }, window.MathJax);
-</script>
-
-    
 
   
 
