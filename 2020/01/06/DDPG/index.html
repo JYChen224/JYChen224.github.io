@@ -45,12 +45,12 @@
   };
 </script>
 
-  <meta name="description" content="### 强化学习中逼近函数的相容性问题 随机性策略的逼近函数相容性 对于随机性策略，策略更新的梯度计算公式为： \[\nabla_\theta J&#x3D;E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\] 随机性策略逼近函数的相容性条件为：  [1] \(Q^w&#x3D;\nabla log_\theta\pi_\theta(a|s)^Tw\) [2] 目">
+  <meta name="description" content="强化学习中逼近函数的相容性问题 随机性策略的逼近函数相容性对于随机性策略，策略更新的梯度计算公式为： \nabla_\theta J&#x3D;E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]随机性策略逼近函数的相容性条件为：  [1] $Q^w&#x3D;\nabla log_\theta\pi_\theta(a|s)^Tw$  [2] 目标函数为 $\epsilon^2&#x3D;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DDPG">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;01&#x2F;06&#x2F;DDPG&#x2F;index.html">
 <meta property="og:site_name" content="JYChen的博客">
-<meta property="og:description" content="### 强化学习中逼近函数的相容性问题 随机性策略的逼近函数相容性 对于随机性策略，策略更新的梯度计算公式为： \[\nabla_\theta J&#x3D;E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\] 随机性策略逼近函数的相容性条件为：  [1] \(Q^w&#x3D;\nabla log_\theta\pi_\theta(a|s)^Tw\) [2] 目">
+<meta property="og:description" content="强化学习中逼近函数的相容性问题 随机性策略的逼近函数相容性对于随机性策略，策略更新的梯度计算公式为： \nabla_\theta J&#x3D;E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]随机性策略逼近函数的相容性条件为：  [1] $Q^w&#x3D;\nabla log_\theta\pi_\theta(a|s)^Tw$  [2] 目标函数为 $\epsilon^2&#x3D;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-01-06T13:15:16.388Z">
 <meta property="article:modified_time" content="2019-12-05T10:18:48.772Z">
@@ -215,20 +215,28 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="强化学习中逼近函数的相容性问题">### 强化学习中逼近函数的相容性问题</h2>
-<h4 id="随机性策略的逼近函数相容性">随机性策略的逼近函数相容性</h4>
-<p>对于随机性策略，策略更新的梯度计算公式为： <span class="math display">\[\nabla_\theta J=E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\]</span></p>
-<p>随机性策略逼近函数的相容性条件为：</p>
+        <h3 id="强化学习中逼近函数的相容性问题"><a href="#强化学习中逼近函数的相容性问题" class="headerlink" title="强化学习中逼近函数的相容性问题"></a>强化学习中逼近函数的相容性问题</h3><hr>
+<h4 id="随机性策略的逼近函数相容性"><a href="#随机性策略的逼近函数相容性" class="headerlink" title="随机性策略的逼近函数相容性"></a>随机性策略的逼近函数相容性</h4><p>对于随机性策略，策略更新的梯度计算公式为：</p>
+<script type="math/tex; mode=display">\nabla_\theta J=E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]</script><p>随机性策略逼近函数的相容性条件为：</p>
 <ul>
-<li>[1] <span class="math inline">\(Q^w=\nabla log_\theta\pi_\theta(a|s)^Tw\)</span></li>
-<li>[2] 目标函数为 <span class="math inline">\(\epsilon^2=E[Q_w(s,a)-Q^\pi(s,a)]^2\)</span></li>
+<li>[1] $Q^w=\nabla log_\theta\pi_\theta(a|s)^Tw$ </li>
+<li>[2] 目标函数为 $\epsilon^2=E[Q_w(s,a)-Q^\pi(s,a)]^2$</li>
 </ul>
-<p>证明： 由于<span class="math inline">\(w\)</span>为目标函数的极值，因此有 <span class="math display">\[\frac{\partial\epsilon^2}{\partial w} = E[Q_w(s,a)-Q^\pi(s,a)]\frac{\partial Q_w(s,a)}{\partial w} = 0\]</span> 将条件[1]带入上式得： <span class="math display">\[E[Q_w(s,a)-Q^\pi(s,a)]\nabla log_\theta\pi_\theta(a|s) = 0\]</span> 展开得： <span class="math display">\[E[Q_w(s,a)\nabla log_\theta\pi_\theta(a|s)] = E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\]</span> 即可得到使用逼近函数进行梯度估计的无偏性</p>
-<hr />
-<h4 id="确定性策略的逼近函数相容性">确定性策略的逼近函数相容性</h4>
-<p>对于确定性策略，策略更新的梯度计算公式为： <span class="math display">\[\nabla_\theta J=E[\nabla_\theta \mu_\theta(s)\nabla_a Q^\mu(s,a)\big|_{a=\mu(s)}]\]</span></p>
-<p>确定性策略逼近函数的相容性条件为： - [1] <span class="math inline">\(\nabla_a Q^w(s,a)\big|_{a=\mu(s)}=\nabla_\theta\mu_\theta(s)^Tw\)</span> - [2] 目标函数为 <span class="math inline">\(MSE(\theta,w)=E[\epsilon(s;\theta,w)^T\epsilon(s;\theta,w)]\)</span> 其中 <span class="math inline">\(\epsilon(s;\theta,w) = (\nabla_a Q^w - \nabla_a Q^\mu)\)</span></p>
-<p>证明： 由于<span class="math inline">\(w\)</span>为目标函数的极值，因此有 <span class="math display">\[(\nabla_a Q^w - \nabla_a Q^\mu)\frac{\partial\nabla_a Q^w}{\partial w} = 0\]</span> 带入条件[1]得 <span class="math display">\[(\nabla_a Q^w - \nabla_a Q^\mu)\nabla_\theta\mu_\theta(s) = 0\]</span> 展开有 <span class="math display">\[\nabla_a Q^w\nabla_\theta\mu_\theta(s) = \nabla_a Q^\mu\nabla_\theta\mu_\theta(s)\]</span> 即可得到使用逼近函数进行梯度估计的无偏性</p>
+<p>证明：<br>由于$w$为目标函数的极值，因此有</p>
+<script type="math/tex; mode=display">\frac{\partial\epsilon^2}{\partial w} = E[Q_w(s,a)-Q^\pi(s,a)]\frac{\partial Q_w(s,a)}{\partial w} = 0</script><p>将条件[1]带入上式得：</p>
+<script type="math/tex; mode=display">E[Q_w(s,a)-Q^\pi(s,a)]\nabla log_\theta\pi_\theta(a|s) = 0</script><p>展开得：</p>
+<script type="math/tex; mode=display">E[Q_w(s,a)\nabla log_\theta\pi_\theta(a|s)] = E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]</script><p>即可得到使用逼近函数进行梯度估计的无偏性</p>
+<hr>
+<h4 id="确定性策略的逼近函数相容性"><a href="#确定性策略的逼近函数相容性" class="headerlink" title="确定性策略的逼近函数相容性"></a>确定性策略的逼近函数相容性</h4><p>对于确定性策略，策略更新的梯度计算公式为：</p>
+<script type="math/tex; mode=display">\nabla_\theta J=E[\nabla_\theta \mu_\theta(s)\nabla_a Q^\mu(s,a)\big|_{a=\mu(s)}]</script><p>确定性策略逼近函数的相容性条件为：</p>
+<ul>
+<li>[1] $\nabla_a Q^w(s,a)\big|_{a=\mu(s)}=\nabla_\theta\mu_\theta(s)^Tw$</li>
+<li>[2] 目标函数为 $MSE(\theta,w)=E[\epsilon(s;\theta,w)^T\epsilon(s;\theta,w)]$<br>其中 $\epsilon(s;\theta,w) = (\nabla_a Q^w - \nabla_a Q^\mu)$</li>
+</ul>
+<p>证明：<br>由于$w$为目标函数的极值，因此有</p>
+<script type="math/tex; mode=display">(\nabla_a Q^w - \nabla_a Q^\mu)\frac{\partial\nabla_a Q^w}{\partial w} = 0</script><p>带入条件[1]得</p>
+<script type="math/tex; mode=display">(\nabla_a Q^w - \nabla_a Q^\mu)\nabla_\theta\mu_\theta(s) = 0</script><p>展开有</p>
+<script type="math/tex; mode=display">\nabla_a Q^w\nabla_\theta\mu_\theta(s) = \nabla_a Q^\mu\nabla_\theta\mu_\theta(s)</script><p>即可得到使用逼近函数进行梯度估计的无偏性</p>
 
     </div>
 
@@ -288,7 +296,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#强化学习中逼近函数的相容性问题"><span class="nav-number">1.</span> <span class="nav-text">### 强化学习中逼近函数的相容性问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#随机性策略的逼近函数相容性"><span class="nav-number">1.0.1.</span> <span class="nav-text">随机性策略的逼近函数相容性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#确定性策略的逼近函数相容性"><span class="nav-number">1.0.2.</span> <span class="nav-text">确定性策略的逼近函数相容性</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#强化学习中逼近函数的相容性问题"><span class="nav-number">1.</span> <span class="nav-text">强化学习中逼近函数的相容性问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#随机性策略的逼近函数相容性"><span class="nav-number">1.1.</span> <span class="nav-text">随机性策略的逼近函数相容性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#确定性策略的逼近函数相容性"><span class="nav-number">1.2.</span> <span class="nav-text">确定性策略的逼近函数相容性</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
