@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
+  <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 4.1.1">
@@ -45,12 +45,12 @@
   };
 </script>
 
-  <meta name="description" content="最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。  1.IMU的组成与原理 IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺仪组成。9DOF的I">
+  <meta name="description" content="最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。 *** #### 1.IMU的组成与原理  IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺">
 <meta property="og:type" content="article">
 <meta property="og:title" content="W6">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;01&#x2F;06&#x2F;W6&#x2F;index.html">
 <meta property="og:site_name" content="JYChen的博客">
-<meta property="og:description" content="最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。  1.IMU的组成与原理 IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺仪组成。9DOF的I">
+<meta property="og:description" content="最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。 *** #### 1.IMU的组成与原理  IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;imgconvert.csdnimg.cn&#x2F;aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6V3lBMS5wbmc?x-oss-process&#x3D;image&#x2F;format,png">
 <meta property="og:image" content="https:&#x2F;&#x2F;imgconvert.csdnimg.cn&#x2F;aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6VzI5Sy5wbmc?x-oss-process&#x3D;image&#x2F;format,png">
@@ -110,12 +110,12 @@
   .use-motion .logo-line-before i { left: initial; }
   .use-motion .logo-line-after i { right: initial; }
   </style>
-</noscript><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</noscript>
 
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container use-motion">
+  <div class="container use-motion">
     <div class="headband"></div>
 
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -225,52 +225,62 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。</p>
-<hr>
-<h4 id="1-IMU的组成与原理"><a href="#1-IMU的组成与原理" class="headerlink" title="1.IMU的组成与原理"></a>1.IMU的组成与原理</h4><p><a href="https://imgchr.com/i/AzWyA1" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6V3lBMS5wbmc?x-oss-process=image/format,png" alt="AzWyA1.png"></a></p>
-<p>IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺仪组成。9DOF的IMU会多一个三轴磁力计。模块所能感知状态量的个数即为DOF大小，DOF越多、精度越高的IMU也就越贵。<br>这里只讨论6DOF的IMU。</p>
-<h6 id="加速度计"><a href="#加速度计" class="headerlink" title="加速度计"></a>加速度计</h6><hr>
-<p>顾名思义，三轴加速度计能感受三轴的加速度，如上图中三个矢量所示。但要注意的是，当图示模块水平放置且静止，z轴方向加速度大小为<code>-g</code>，也就是说IMU测量的加速度与物体真实加速度相差一个重力加速度。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6VzI5Sy5wbmc?x-oss-process=image/format,png" alt="AzW29K.png">]<br>加速度计的物理实现是利用牛顿第二定律，如上图所示，中间红色物体为一个质量块，两头通过具有弹簧性质的长条结构与基底相连，红色的短栅与绿色的短栅分别为电容的极板。当基底在双箭头方向有加速度<code>a</code>时，由<code>f=ma=kx</code>，质量块会沿加速度相反的方向移动，红色极板与绿色极板之间的距离会发生变化，通过测量极板电容<code>C</code>的变化就可以得到加速度的大小。在三轴加速度计中，这样的结构在三个方向各有一个，且做到了微米的尺寸，并配合相应的测量电路集成在一个芯片中（如图一所示），构成一个微机电系统（MEMS）。</p>
-<h6 id="陀螺仪"><a href="#陀螺仪" class="headerlink" title="陀螺仪"></a>陀螺仪</h6><hr>
+        <p>最近做了一套基于IMU的人体姿态检测系统，用来取代动作捕捉系统。一方面IMU的实时性和可开发性比动捕要好，另一方面IMU成本很低的同时精度也足以满足需求。本文介绍IMU的基本原理与基于IMU的人体姿态检测系统的设计。 *** #### 1.IMU的组成与原理 <a href="https://imgchr.com/i/AzWyA1" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6V3lBMS5wbmc?x-oss-process=image/format,png" alt="AzWyA1.png" /></a></p>
+<p>IMU可根据DOF的不同来加以区分，其中6DOF的IMU和9DOF的IMU比较常见，6DOF的IMU一般由一个三轴加速度计和一个三轴陀螺仪组成。9DOF的IMU会多一个三轴磁力计。模块所能感知状态量的个数即为DOF大小，DOF越多、精度越高的IMU也就越贵。 这里只讨论6DOF的IMU。</p>
+<h6 id="加速度计">加速度计</h6>
+<hr />
+<p>顾名思义，三轴加速度计能感受三轴的加速度，如上图中三个矢量所示。但要注意的是，当图示模块水平放置且静止，z轴方向加速度大小为<code>-g</code>，也就是说IMU测量的加速度与物体真实加速度相差一个重力加速度。 <img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6VzI5Sy5wbmc?x-oss-process=image/format,png" alt="AzW29K.png" />] 加速度计的物理实现是利用牛顿第二定律，如上图所示，中间红色物体为一个质量块，两头通过具有弹簧性质的长条结构与基底相连，红色的短栅与绿色的短栅分别为电容的极板。当基底在双箭头方向有加速度<code>a</code>时，由<code>f=ma=kx</code>，质量块会沿加速度相反的方向移动，红色极板与绿色极板之间的距离会发生变化，通过测量极板电容<code>C</code>的变化就可以得到加速度的大小。在三轴加速度计中，这样的结构在三个方向各有一个，且做到了微米的尺寸，并配合相应的测量电路集成在一个芯片中（如图一所示），构成一个微机电系统（MEMS）。</p>
+<h6 id="陀螺仪">陀螺仪</h6>
+<hr />
 <p>角速度测量的原理比加速度要复杂一些，因为涉及了科里奥里力(Coriolis Force)。所以我们先来说一下Coriolis Force。科里奥里力是由坐标系的转动与物体在动坐标系中的相对运动引起的，其本质是物体的惯性。</p>
-<p> <img src="https://s2.ax1x.com/2019/04/17/AzbNVO.png" width="60%"></p>
+<p><img src="https://s2.ax1x.com/2019/04/17/AzbNVO.png" width="60%"></p>
 <p>如果图示模块置于绝对静止的坐标系中，当在x方向施加一个驱动力使质量块运动时，根据牛顿第二定律，质量块只会在x方向上运动，而在y方向上不会运动。</p>
-<p> <img src="https://s2.ax1x.com/2019/04/17/AzbUaD.png" width="60%"></p>
+<p><img src="https://s2.ax1x.com/2019/04/17/AzbUaD.png" width="60%"></p>
 <p>但如果将图示模块置于一个旋转坐标系下，由于坐标系的旋转，使得当质量块沿x方向运动时，在y方向上会受到一个力，即科里奥里力<code>F=-2mvω</code>，从而使质量块沿y方向运动。地球上的很多自然现象，如热带气旋、季风带、河道两侧冲刷程度不同，都源于科里奥里力。</p>
-<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-6Gv6gntY-1575004767576)(<a href="https://s2.ax1x.com/2019/04/17/AzW6tx.png" target="_blank" rel="noopener">https://s2.ax1x.com/2019/04/17/AzW6tx.png</a>)]</p>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-6Gv6gntY-1575004767576)(https://s2.ax1x.com/2019/04/17/AzW6tx.png)]</p>
 <p>陀螺仪的物理实现如上图所示，外侧的蓝色与黄色部分为驱动电极，内部的红色与蓝色为测量电极。在模块的驱动方向施加正弦驱动电压，当模块发生旋转时，质量块在垂直方向受科里奥里力影响也会产生一个正弦运动，且正弦运动的幅值与平台的角速度成正比，通过垂直方向的电极测量出此幅值，便可以得到模块角速度。与三轴加速度计一样，这样的结构在三轴陀螺仪的三个方向上各有一个，从而测量出三个方向的角速度。</p>
-<h5 id="2-IMU姿态解算"><a href="#2-IMU姿态解算" class="headerlink" title="2. IMU姿态解算"></a>2. IMU姿态解算</h5><p>现在我们能够从IMU中得到三轴的加速度和三轴的角速度，接下来就要从这些数据中解算出三个方向的角度。实际上，单独由加速度计或陀螺仪都可以解算出三轴的角度。</p>
-<h6 id="由加速度解算角度"><a href="#由加速度解算角度" class="headerlink" title="由加速度解算角度"></a>由加速度解算角度</h6><hr>
-<p><a href="https://imgchr.com/i/AzjknI" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6amtuSS5wbmc?x-oss-process=image/format,png" alt="AzjknI.png"></a></p>
+<h5 id="imu姿态解算">2. IMU姿态解算</h5>
+<p>现在我们能够从IMU中得到三轴的加速度和三轴的角速度，接下来就要从这些数据中解算出三个方向的角度。实际上，单独由加速度计或陀螺仪都可以解算出三轴的角度。</p>
+<h6 id="由加速度解算角度">由加速度解算角度</h6>
+<hr />
+<p><a href="https://imgchr.com/i/AzjknI" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6amtuSS5wbmc?x-oss-process=image/format,png" alt="AzjknI.png" /></a></p>
 <p>由于加速度计本质是测量力，所以在传感器静止的时候，测量的结果为重力加速度。当平台运动的加速度远小于重力加速度时，可认为传感器测量的结果全部为重力加速度，因此可以根据重力加速的在三轴分量的大小来解算出角度。</p>
-<p><a href="https://imgchr.com/i/AzjijA" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6amlqQS5wbmc?x-oss-process=image/format,png" alt="AzjijA.png"></a></p>
-<p>以上图为例，传感器沿<code>y</code>方向倾斜的角度为：</p>
-<script type="math/tex; mode=display">
-Angle_{Accel} = arccos\frac{ax}{-g}</script><h6 id="由陀螺仪解算角度"><a href="#由陀螺仪解算角度" class="headerlink" title="由陀螺仪解算角度"></a>由陀螺仪解算角度</h6><hr>
-<p>由角速度解算角度很容易理解，当知道陀螺仪的初始角度时，对角速度进行积分就可以得到角度值。</p>
-<script type="math/tex; mode=display">
-Angle_{Gyro}=Angle_0 + \int_0^t Gyro dt</script><h6 id="数据融合"><a href="#数据融合" class="headerlink" title="数据融合"></a>数据融合</h6><hr>
-<p>现在我们可以从加速度和角速度分别解算出角度，但这两种方式都存在很大的问题。一方面由于加速度计容易受到振动的影响，噪声很大，所以解算角度的噪声也很大；另一方面虽然陀螺仪测量角速度的噪声不是很大，经过积分环节后噪声进一步被变小，但由于初始角度并不能准确得到，而且角速度存在零漂问题（即模块静止时角速度不完全为0，而是有一个偏置），经过积分后这个误差会被累积。<br>因此，两种方式解算出来的角度都无法直接使用，但我们可以采用数据融合的方法，把两种角度融合在一起，得到一个既没有累计误差、噪声又小的角度数据。</p>
-<h6 id="互补滤波"><a href="#互补滤波" class="headerlink" title="互补滤波"></a>互补滤波</h6><hr>
-<p>一阶互补滤波是最简单但却非常实用的数据融合算法，它把由加速度解算的角度和由角速度积分的角度按照一定比例加到一起，公式如下：</p>
-<script type="math/tex; mode=display">
-Angle = K\cdot Angle_{accel}+(1-K)\cdot (Angle + \omega\cdot dt)</script><p>其中参数<code>K</code>表示对加速度解算角度的置信程度，由于加速度的噪声很大，所以参数<code>K</code>一般很小，典型值为<code>0.05</code>，实际使用要根据效果来调整。</p>
+<p><a href="https://imgchr.com/i/AzjijA" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA0LzE3L0F6amlqQS5wbmc?x-oss-process=image/format,png" alt="AzjijA.png" /></a></p>
+<p>以上图为例，传感器沿<code>y</code>方向倾斜的角度为： <span class="math display">\[
+Angle_{Accel} = arccos\frac{ax}{-g}
+\]</span></p>
+<h6 id="由陀螺仪解算角度">由陀螺仪解算角度</h6>
+<hr />
+<p>由角速度解算角度很容易理解，当知道陀螺仪的初始角度时，对角速度进行积分就可以得到角度值。 <span class="math display">\[
+Angle_{Gyro}=Angle_0 + \int_0^t Gyro dt
+\]</span></p>
+<h6 id="数据融合">数据融合</h6>
+<hr />
+<p>现在我们可以从加速度和角速度分别解算出角度，但这两种方式都存在很大的问题。一方面由于加速度计容易受到振动的影响，噪声很大，所以解算角度的噪声也很大；另一方面虽然陀螺仪测量角速度的噪声不是很大，经过积分环节后噪声进一步被变小，但由于初始角度并不能准确得到，而且角速度存在零漂问题（即模块静止时角速度不完全为0，而是有一个偏置），经过积分后这个误差会被累积。 因此，两种方式解算出来的角度都无法直接使用，但我们可以采用数据融合的方法，把两种角度融合在一起，得到一个既没有累计误差、噪声又小的角度数据。</p>
+<h6 id="互补滤波">互补滤波</h6>
+<hr />
+<p>一阶互补滤波是最简单但却非常实用的数据融合算法，它把由加速度解算的角度和由角速度积分的角度按照一定比例加到一起，公式如下： <span class="math display">\[
+Angle = K\cdot Angle_{accel}+(1-K)\cdot (Angle + \omega\cdot dt)
+\]</span> 其中参数<code>K</code>表示对加速度解算角度的置信程度，由于加速度的噪声很大，所以参数<code>K</code>一般很小，典型值为<code>0.05</code>，实际使用要根据效果来调整。</p>
 <p>这样的互补滤波器可以看做是一个高通滤波和一个低通滤波的叠加：公式的第一项是为低通滤波部分，目的是滤除加速度的噪声；公式的第二项为高通滤波部分，目的是滤除角速度的直流偏置（零漂）。</p>
-<h6 id="Kalman滤波"><a href="#Kalman滤波" class="headerlink" title="Kalman滤波"></a>Kalman滤波</h6><hr>
+<h6 id="kalman滤波">Kalman滤波</h6>
+<hr />
 <p>互补滤波虽然简单实用易理解，但我们还有更好的算法来进行数据融合，比如Kalman滤波。关于Kalman滤波的原理，有一些非常好的论文和博客，感兴趣的同学可以移步这些网站:</p>
-<p><a href="http://www.cs.unc.edu/~welch/kalman/media/pdf/Kalman1960.pdf" target="_blank" rel="noopener">Kalman先生1960年的论文</a><br><a href="https://list.yinxiang.com/markdown/eef42447-db3f-48ee-827b-1bb34c03eb83.php" target="_blank" rel="noopener">博客 How a Kalman filter works</a><br><a href="https://blog.csdn.net/u010720661/article/details/63253509" target="_blank" rel="noopener">上篇博客的中文版</a><br><a href="https://courses.engr.illinois.edu/ece420/sp2017/UnderstandingKalmanFilter.pdf" target="_blank" rel="noopener">论文 Understanding Kalman Filter</a><br><a href="https://www.jianshu.com/p/d3b1c3d307e0" target="_blank" rel="noopener">上篇论文的中文版</a></p>
+<p><a href="http://www.cs.unc.edu/~welch/kalman/media/pdf/Kalman1960.pdf" target="_blank" rel="noopener">Kalman先生1960年的论文</a> <a href="https://list.yinxiang.com/markdown/eef42447-db3f-48ee-827b-1bb34c03eb83.php" target="_blank" rel="noopener">博客 How a Kalman filter works</a> <a href="https://blog.csdn.net/u010720661/article/details/63253509" target="_blank" rel="noopener">上篇博客的中文版</a> <a href="https://courses.engr.illinois.edu/ece420/sp2017/UnderstandingKalmanFilter.pdf" target="_blank" rel="noopener">论文 Understanding Kalman Filter</a> <a href="https://www.jianshu.com/p/d3b1c3d307e0" target="_blank" rel="noopener">上篇论文的中文版</a></p>
 <p>Kalman滤波的原理稍过复杂，这里并不打算深入讨论。但由于博客和论坛上关于用Kalman滤波融合加速度计和陀螺仪数据的建模方法介绍比较少，所以这里给出本问题状态空间方程的建立方法。</p>
-<p>和一般系统的建模方法不同，本问题中的状态变量不是角度和角速度，而是角度和角速度的偏置：</p>
-<script type="math/tex; mode=display">
-State = \begin{bmatrix} Angle(k)  \\ Gyro_{bias}(k) \\  \end{bmatrix}</script><p>状态空间模型考虑带控制量的形式，其中控制量为陀螺仪测量的角速度，观测方程中只有从加速度解算得到的角度，方程如下：</p>
-<script type="math/tex; mode=display">
-\begin{bmatrix} Angle(k+1)  \\ Gyro_{bias}(k+1)   \end{bmatrix} = \begin{bmatrix} 1 & -dt \\ 0 & 1   \end{bmatrix}\begin{bmatrix} Angle(k)  \\ Gyro_{bias}(k) \end{bmatrix} + \begin{bmatrix} dt \\ 0  \end{bmatrix} Gyro(k) + W(k)</script><script type="math/tex; mode=display">
-Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k) \\ Gyro_{bias}(k)  \end{bmatrix} + V(k)</script><p>其中矩阵<code>W</code>和<code>V</code>分别为输入噪声矩阵和观测噪声矩阵，这两个矩阵的参数需要根据情况进行调整。对于本问题矩阵<code>V</code>的参数要比<code>W</code>的参数大很多，因为由加速度计观测角度的噪声很大。</p>
-<hr>
-<h5 id="3-使用IMU来测量关节角度"><a href="#3-使用IMU来测量关节角度" class="headerlink" title="3.使用IMU来测量关节角度"></a>3.使用IMU来测量关节角度</h5><p>这里基于IMU设计了一套用来测量人体姿态的硬件，通过在身体每个肢段上放置一个IMU，测量每段肢体在空间中的姿态角，下位机使用单片机通过串口接收每个IMU模块的数据，然后通过CAN总线发送给上位机，上位机再解算出关节角度。制作的模块如下：</p>
+<p>和一般系统的建模方法不同，本问题中的状态变量不是角度和角速度，而是角度和角速度的偏置： <span class="math display">\[
+State = \begin{bmatrix} Angle(k)  \\ Gyro_{bias}(k) \\  \end{bmatrix}
+\]</span> 状态空间模型考虑带控制量的形式，其中控制量为陀螺仪测量的角速度，观测方程中只有从加速度解算得到的角度，方程如下： <span class="math display">\[
+\begin{bmatrix} Angle(k+1)  \\ Gyro_{bias}(k+1)   \end{bmatrix} = \begin{bmatrix} 1 &amp; -dt \\ 0 &amp; 1   \end{bmatrix}\begin{bmatrix} Angle(k)  \\ Gyro_{bias}(k) \end{bmatrix} + \begin{bmatrix} dt \\ 0  \end{bmatrix} Gyro(k) + W(k)
+\]</span> <span class="math display">\[
+Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angle(k) \\ Gyro_{bias}(k)  \end{bmatrix} + V(k)
+\]</span> 其中矩阵<code>W</code>和<code>V</code>分别为输入噪声矩阵和观测噪声矩阵，这两个矩阵的参数需要根据情况进行调整。对于本问题矩阵<code>V</code>的参数要比<code>W</code>的参数大很多，因为由加速度计观测角度的噪声很大。</p>
+<hr />
+<h5 id="使用imu来测量关节角度">3.使用IMU来测量关节角度</h5>
+<p>这里基于IMU设计了一套用来测量人体姿态的硬件，通过在身体每个肢段上放置一个IMU，测量每段肢体在空间中的姿态角，下位机使用单片机通过串口接收每个IMU模块的数据，然后通过CAN总线发送给上位机，上位机再解算出关节角度。制作的模块如下：</p>
 <p><img src="https://s2.ax1x.com/2019/04/18/ESLlLt.jpg" width="60%"><img src="https://s2.ax1x.com/2019/04/18/ESL3eP.jpg" width="33.6%"></p>
 <p>下图是测量大腿和小腿的数据，Matlab对接收的数据进行解算并实时显示出来。</p>
-<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-9QTqCGKZ-1575004767580)(<a href="https://s2.ax1x.com/2019/04/18/ESXNKs.gif" target="_blank" rel="noopener">https://s2.ax1x.com/2019/04/18/ESXNKs.gif</a>)]</p>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-9QTqCGKZ-1575004767580)(https://s2.ax1x.com/2019/04/18/ESXNKs.gif)]</p>
 <p>下图是由IMU得到的行走状态下肢三关节的角度变化。初次实验采样频率设置的有点低，只有50HZ，所以波形看起来不太平滑。</p>
 <p><img src="https://s2.ax1x.com/2019/04/19/E9FtwF.png" width="90%"></p>
 
@@ -332,7 +342,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-IMU的组成与原理"><span class="nav-number">1.</span> <span class="nav-text">1.IMU的组成与原理</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#加速度计"><span class="nav-number">1.0.1.</span> <span class="nav-text">加速度计</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#陀螺仪"><span class="nav-number">1.0.2.</span> <span class="nav-text">陀螺仪</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-IMU姿态解算"><span class="nav-number">1.1.</span> <span class="nav-text">2. IMU姿态解算</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#由加速度解算角度"><span class="nav-number">1.1.1.</span> <span class="nav-text">由加速度解算角度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#由陀螺仪解算角度"><span class="nav-number">1.1.2.</span> <span class="nav-text">由陀螺仪解算角度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#数据融合"><span class="nav-number">1.1.3.</span> <span class="nav-text">数据融合</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#互补滤波"><span class="nav-number">1.1.4.</span> <span class="nav-text">互补滤波</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Kalman滤波"><span class="nav-number">1.1.5.</span> <span class="nav-text">Kalman滤波</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-使用IMU来测量关节角度"><span class="nav-number">1.2.</span> <span class="nav-text">3.使用IMU来测量关节角度</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#加速度计"><span class="nav-number">1.</span> <span class="nav-text">加速度计</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#陀螺仪"><span class="nav-number">2.</span> <span class="nav-text">陀螺仪</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#imu姿态解算"><span class="nav-number"></span> <span class="nav-text">2. IMU姿态解算</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#由加速度解算角度"><span class="nav-number">1.</span> <span class="nav-text">由加速度解算角度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#由陀螺仪解算角度"><span class="nav-number">2.</span> <span class="nav-text">由陀螺仪解算角度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#数据融合"><span class="nav-number">3.</span> <span class="nav-text">数据融合</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#互补滤波"><span class="nav-number">4.</span> <span class="nav-text">互补滤波</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#kalman滤波"><span class="nav-number">5.</span> <span class="nav-text">Kalman滤波</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用imu来测量关节角度"><span class="nav-number"></span> <span class="nav-text">3.使用IMU来测量关节角度</span></a></div>
       </div>
       <!--/noindex-->
 
@@ -411,7 +421,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
 <script src="/js/schemes/muse.js"></script>
 
 
-<script src="/js/next-boot.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -432,6 +442,8 @@ Angle_{accel}(k) =\begin{bmatrix} 1 & 0  \end{bmatrix}  \begin{bmatrix} Angle(k)
 
 
 
+
+  
 
   
 
