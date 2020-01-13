@@ -7,12 +7,12 @@
   
   <title>W2 | JYChen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="混合控制中的平滑切换问题当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65\%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。 如图1所示，在步态状态切换时（65\%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电">
+  <meta name="description" content="混合控制中的平滑切换问题 当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。 如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得">
 <meta property="og:type" content="article">
 <meta property="og:title" content="W2">
 <meta property="og:url" content="https:&#x2F;&#x2F;jychen224.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;W2&#x2F;index.html">
 <meta property="og:site_name" content="JYChen">
-<meta property="og:description" content="混合控制中的平滑切换问题当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65\%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。 如图1所示，在步态状态切换时（65\%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电">
+<meta property="og:description" content="混合控制中的平滑切换问题 当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。 如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20191020220046816.jpg?x-oss-process&#x3D;image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
 <meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2019102022070124.png?x-oss-process&#x3D;image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
@@ -76,11 +76,11 @@
     </div>
     <nav id="main-nav">
       
-        <a class="main-nav-link" href="/">Home</a>
+        <a class="main-nav-link" href="/">主页</a>
       
-        <a class="main-nav-link" href="/archives">Archives</a>
+        <a class="main-nav-link" href="/categories">分类</a>
       
-        <a class="main-nav-link" href="/about">About</a>
+        <a class="main-nav-link" href="/tags">标签</a>
       
       <a class="main-nav-link st-search-show-outputs">搜索</a>
     </nav>
@@ -113,73 +113,75 @@
     <div class="article-entry" itemprop="articleBody">
       
         
-        <h3 id="混合控制中的平滑切换问题"><a href="#混合控制中的平滑切换问题" class="headerlink" title="混合控制中的平滑切换问题"></a>混合控制中的平滑切换问题</h3><p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65\%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
-<p>如图1所示，在步态状态切换时（65\%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
-<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即$vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}$。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
+        <h3 id="混合控制中的平滑切换问题">混合控制中的平滑切换问题</h3>
+<p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
+<p>如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
+<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即<span class="math inline">\(vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}\)</span>。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
 <table>
-    <tr>
-        <td><center>
-        <img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-        </center>
-        <center>
-        图1 电机控制指令关于步态周期的曲线
-        </center></td> 
-    </tr><tr>
-</tr></table>
-
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图1 电机控制指令关于步态周期的曲线
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
 <table>
-    <tr>
-        <td><center>
-        <img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-        </center>
-        <center>
-        图2 加入过渡阶段的控制时序
-        </center></td> 
-    </tr><tr>
-</tr></table>
-
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图2 加入过渡阶段的控制时序
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
 <table>
-    <tr>
-        <td><center>
-        <img src="https://img-blog.csdnimg.cn/20191020220136408.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-        </center>
-        <center>
-        图3 平滑切换策略下，电机控制指令关于步态周期的曲线
-        </center></td> 
-    </tr><tr>
-</tr></table>
-
-<h3 id="助力过程鲍登线的长度变化"><a href="#助力过程鲍登线的长度变化" class="headerlink" title="助力过程鲍登线的长度变化"></a>助力过程鲍登线的长度变化</h3><p>在安装踝关节编码器后，可以基于踝关节角度和电机角度对鲍登线-弹簧的长度变化和刚度系数进行分析。<br>首先基于力矩控制实验的数据，我们计算了在峰值力矩为$35N\cdot m$时，鲍登线（弹簧）长度的变化（$\theta_m - \theta_aR$）与测量力矩的关系曲线，如图4所示，其中彩色曲线为60步的平均曲线，蓝色端表示步态开始，黄色端表示步态结束。由图可以看出，尽管曲线存在明显的非线性（死区：长度变化较小时力矩没有变化的问题，迟滞：力矩上升和下降时曲线不一致），但这些非线性似乎是确定的，而且鲍登线与弹簧整体的刚度系数（曲线斜率）似乎保是一个常数。若这种现象在力矩变化的时候也成立，或许可以考虑对非线性过程建模，从而设计更复杂的控制器。</p>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020220136408.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图3 平滑切换策略下，电机控制指令关于步态周期的曲线
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
+<h3 id="助力过程鲍登线的长度变化">助力过程鲍登线的长度变化</h3>
+<p>在安装踝关节编码器后，可以基于踝关节角度和电机角度对鲍登线-弹簧的长度变化和刚度系数进行分析。 首先基于力矩控制实验的数据，我们计算了在峰值力矩为<span class="math inline">\(35N\cdot m\)</span>时，鲍登线（弹簧）长度的变化（<span class="math inline">\(\theta_m - \theta_aR\)</span>）与测量力矩的关系曲线，如图4所示，其中彩色曲线为60步的平均曲线，蓝色端表示步态开始，黄色端表示步态结束。由图可以看出，尽管曲线存在明显的非线性（死区：长度变化较小时力矩没有变化的问题，迟滞：力矩上升和下降时曲线不一致），但这些非线性似乎是确定的，而且鲍登线与弹簧整体的刚度系数（曲线斜率）似乎保是一个常数。若这种现象在力矩变化的时候也成立，或许可以考虑对非线性过程建模，从而设计更复杂的控制器。</p>
 <table>
-    <tr>
-        <td><center>
-        <img src="https://img-blog.csdnimg.cn/20191020221102842.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-        </center>
-        <center>
-        图4 峰值力矩为$35N\cdot m$时，等效弹簧长度的变化与交互力矩的关系
-        </center></td> 
-    </tr><tr>
-</tr></table>
-
-<p>之后我们进行了进一步的实验，将峰值力矩从为$35N\cdot m$逐渐增加到$60N\cdot m$。在变化的过程中，鲍登线（弹簧）长度的变化与交互力矩的关系如图1.13所示，其中蓝色曲线代表峰值力矩较小的情况，黄色曲线代表峰值力矩较大的情况。在这个实验中，虽然鲍登线与弹簧整体的刚度系数仍保持着固定常数关系，但非线性情况发生了明显变化:随着峰值力矩的增加，曲线整体向右移动。这或许是由于较大的峰值力矩导致鲍登线整体被拉长，使得非线性的死区阈值发生了变化。图1.14,鲍登线（弹簧）长度变化关于步态周期的曲线也能够佐证这一观点，在较大的拉力作用下，鲍登线整体被拉长了约1cm。<br>此实验结果强调了对鲍登绳进行最大力矩完全拉伸实验的重要性。关于鲍登绳完全拉伸后的长度与交互力矩关系，后续实验会继续进行研究。</p>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020221102842.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图4 峰值力矩为$35N\cdot m$时，等效弹簧长度的变化与交互力矩的关系
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
+<p>之后我们进行了进一步的实验，将峰值力矩从为<span class="math inline">\(35N\cdot m\)</span>逐渐增加到<span class="math inline">\(60N\cdot m\)</span>。在变化的过程中，鲍登线（弹簧）长度的变化与交互力矩的关系如图1.13所示，其中蓝色曲线代表峰值力矩较小的情况，黄色曲线代表峰值力矩较大的情况。在这个实验中，虽然鲍登线与弹簧整体的刚度系数仍保持着固定常数关系，但非线性情况发生了明显变化:随着峰值力矩的增加，曲线整体向右移动。这或许是由于较大的峰值力矩导致鲍登线整体被拉长，使得非线性的死区阈值发生了变化。图1.14,鲍登线（弹簧）长度变化关于步态周期的曲线也能够佐证这一观点，在较大的拉力作用下，鲍登线整体被拉长了约1cm。 此实验结果强调了对鲍登绳进行最大力矩完全拉伸实验的重要性。关于鲍登绳完全拉伸后的长度与交互力矩关系，后续实验会继续进行研究。</p>
 <table>
-    <tr>
-        <td><center>
-        <img src="https://img-blog.csdnimg.cn/20191020221353229.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-        </center>
-        <center>
-        图5 峰值力矩变化时，等效弹簧长度的变化与交互力矩的关系
-        </center></td> 
-    </tr><tr>
-</tr></table>
-
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020221353229.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图5 峰值力矩变化时，等效弹簧长度的变化与交互力矩的关系
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
 
       
     </div>
     <footer class="article-footer">
       <div class="article-footer-content">
         
-        <a data-url="https://jychen224.github.io/2020/01/06/W2/" data-id="ck5c7vj17000b98ux2cpy4dtq" class="article-share-link">分享到</a>
+        <a data-url="https://jychen224.github.io/2020/01/06/W2/" data-id="ck5c805ag000af0uxabnnd1bf" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -281,11 +283,11 @@
   </div>
   <nav id="mobile-nav">
   
-    <a href="/" class="mobile-nav-link">Home</a>
+    <a href="/" class="mobile-nav-link">主页</a>
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+    <a href="/categories" class="mobile-nav-link">分类</a>
   
-    <a href="/about" class="mobile-nav-link">About</a>
+    <a href="/tags" class="mobile-nav-link">标签</a>
   
   <a href="#search" class="mobile-nav-link st-search-show-outputs">搜索</a>
 </nav>
