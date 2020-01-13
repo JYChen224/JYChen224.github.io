@@ -7,12 +7,12 @@
   
   <title>数值计算基础 | JYChen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="### 数据插值 数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。 使用最多的为三次样条插值。 123456789yi &#x3D; spline(x,y,xi)pp &#x3D; spline(x,y)pp &#x3D; csape(x,y,conds,">
+  <meta name="description" content="数据插值 数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。使用最多的为三次样条插值。 123456789yi &#x3D; spline(x,y,xi)pp &#x3D; spline(x,y)pp &#x3D; csape(x,y,conds,valcond">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数值计算基础">
 <meta property="og:url" content="https:&#x2F;&#x2F;jychen224.github.io&#x2F;2020&#x2F;01&#x2F;04&#x2F;W4&#x2F;index.html">
 <meta property="og:site_name" content="JYChen">
-<meta property="og:description" content="### 数据插值 数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。 使用最多的为三次样条插值。 123456789yi &#x3D; spline(x,y,xi)pp &#x3D; spline(x,y)pp &#x3D; csape(x,y,conds,">
+<meta property="og:description" content="数据插值 数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。使用最多的为三次样条插值。 123456789yi &#x3D; spline(x,y,xi)pp &#x3D; spline(x,y)pp &#x3D; csape(x,y,conds,valcond">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-01-03T16:00:00.000Z">
 <meta property="article:modified_time" content="2020-01-08T10:24:48.978Z">
@@ -112,145 +112,148 @@
     <div class="article-entry" itemprop="articleBody">
       
         
-        <h2 id="数据插值">### 数据插值</h2>
-<p>数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。 使用最多的为三次样条插值。</p>
+        <h3 id="数据插值"><a href="#数据插值" class="headerlink" title="数据插值"></a>数据插值</h3><hr>
+<p>数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。<br>使用最多的为三次样条插值。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">yi = spline(x,y,xi)</span><br><span class="line">pp = spline(x,y)</span><br><span class="line">pp = csape(x,y,conds,valconds)</span><br><span class="line">    valconds: </span><br><span class="line">        'complete'          固定边界条件</span><br><span class="line">        'not-a-knot'        非扭结边界条件（默认）</span><br><span class="line">        'periodic'          周期边界条件</span><br><span class="line">        'second'            自由边界条件</span><br><span class="line">        'variational'       自然边界条件</span><br></pre></td></tr></table></figure>
-<h2 id="数据拟合">### 数据拟合</h2>
+<h3 id="数据拟合"><a href="#数据拟合" class="headerlink" title="数据拟合"></a>数据拟合</h3><hr>
 <ul>
 <li>工具箱：cftool + Code Generation</li>
-<li>函 数：fit</li>
+<li>函  数：fit</li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fitobject = fit(x,y,fitType)</span><br><span class="line">fitobject = fit([x,y],z,fitType)</span><br><span class="line">&lt;fitType -- cflibhelp&gt;</span><br></pre></td></tr></table></figure>
+<div class="table-container">
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>FitType</th>
 <th>Equation</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>poly1</td>
 <td>Y = p1*x+p2</td>
 </tr>
-<tr class="even">
+<tr>
 <td>poly2</td>
 <td>Y = p1<em>x^2+p2</em>x+p3</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>poly21</td>
 <td>Z = p00 + p10<em>x + p01</em>y + p20<em>x^2 + p11</em>x*y</td>
 </tr>
-<tr class="even">
+<tr>
 <td>poly13</td>
 <td>Z = p00 + p10<em>x + p01</em>y + p11<em>x</em>y + p02<em>y^2 + p12</em>x<em>y^2 + p03</em>y^3</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>weibull</td>
-<td>Y = a<em>b</em>x<sup>(b-1)<em>exp(-a</em>x</sup>b)</td>
+<td>Y = a<em>b</em>x^(b-1)<em>exp(-a</em>x^b)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>exp1</td>
 <td>Y = a<em>exp(b</em>x)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>exp2</td>
 <td>Y = a<em>exp(b</em>x)+c<em>exp(d</em>x)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>fourier1</td>
 <td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>fourier2</td>
-<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)... +a2<em>cos(2</em>x<em>p)+b2</em>sin(2<em>x</em>p)</td>
+<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)… +a2<em>cos(2</em>x<em>p)+b2</em>sin(2<em>x</em>p)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>gauss1</td>
 <td>Y = a1*exp(-((x-b1)/c1)^2)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>gauss2</td>
-<td>Y = a1<em>exp(-((x-b1)/c1)^2)+a2</em>... exp(-((x-b2)/c2)^2)</td>
+<td>Y = a1<em>exp(-((x-b1)/c1)^2)+a2</em>… exp(-((x-b2)/c2)^2)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>power1</td>
 <td>Y = a*x^b</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>power2</td>
 <td>Y = a*x^b+c</td>
 </tr>
-<tr class="even">
+<tr>
 <td>rat02</td>
 <td>Y = (p1)/(x^2+q1*x+q2)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>rat21</td>
 <td>Y = (p1<em>x^2+p2</em>x+p3)/(x+q1)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>sin1</td>
 <td>Y = a1<em>sin(b1</em>x+c1)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>sin2</td>
-<td>Y = a1<em>sin(b1</em>x+c1)+a2<em>sin... (b2</em>x+c2)</td>
+<td>Y = a1<em>sin(b1</em>x+c1)+a2<em>sin… (b2</em>x+c2)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="数值积分">### 数值积分</h2>
+</div>
+<h3 id="数值积分"><a href="#数值积分" class="headerlink" title="数值积分"></a>数值积分</h3><hr>
+<div class="table-container">
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>函数</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>int</td>
 <td>符号函数</td>
 </tr>
-<tr class="even">
+<tr>
 <td>trapz</td>
 <td>非函数表达式梯形积分</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>quad</td>
 <td>自适应Simpson积分，对非光滑函数最为有效的地低阶积分</td>
 </tr>
-<tr class="even">
+<tr>
 <td>quadl</td>
 <td>适用于光滑函数，在高精度时比quad更有效</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>quadgk</td>
 <td>对震荡的被积函数最有效，支持无限区间积分，允许积分区间短点有若的奇异性</td>
 </tr>
-<tr class="even">
+<tr>
 <td>quadv</td>
 <td>quad积分函数的向量化版本</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>quad2d</td>
 <td>平面区域的二重积分，为通用的二重积分，可以做变上限、下限积分</td>
 </tr>
-<tr class="even">
+<tr>
 <td>dblquad</td>
 <td>矩形区域的二重积分</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>triplequad</td>
 <td>长方体区域的三重积分</td>
 </tr>
 </tbody>
 </table>
-<h2 id="常微分方程">### 常微分方程</h2>
-<p>常微分方程求解器比较 |求解器|刚性|算法|应用差场合| |--- |--- |--- |--- | |ode45|非刚性|单步，4-5阶龙格-库塔|首选，大多数场合| |ode23|非刚性|单步，2-3阶龙格-库塔|精度较低场合| |ode113|非刚性|多步，1-13阶Adams算法|若ode45计算时间长，尝试ode113| |ode15s|刚性|多步，Gear's反向数值积分|存在质量矩阵时| |ode23s|刚性|单步，2阶Rosenbrock算法|低精度或存在质量矩阵时| |ode23t|中等刚性|梯形算法|中等刚度问题| |ode23tb|刚性|梯形-反向数值微分两阶段算法|低精度或存在质量矩阵| |ode15i|完全隐式|可以求解完全隐式的常微分方程|完全隐式方程|</p>
+</div>
+<h3 id="常微分方程"><a href="#常微分方程" class="headerlink" title="常微分方程"></a>常微分方程</h3><hr>
+<p>常微分方程求解器比较<br>|求解器|刚性|算法|应用差场合|<br>|—-   |—- |—- |—-       |<br>|ode45|非刚性|单步，4-5阶龙格-库塔|首选，大多数场合|<br>|ode23|非刚性|单步，2-3阶龙格-库塔|精度较低场合|<br>|ode113|非刚性|多步，1-13阶Adams算法|若ode45计算时间长，尝试ode113|<br>|ode15s|刚性|多步，Gear’s反向数值积分|存在质量矩阵时|<br>|ode23s|刚性|单步，2阶Rosenbrock算法|低精度或存在质量矩阵时|<br>|ode23t|中等刚性|梯形算法|中等刚度问题|<br>|ode23tb|刚性|梯形-反向数值微分两阶段算法|低精度或存在质量矩阵|<br>|ode15i|完全隐式|可以求解完全隐式的常微分方程|完全隐式方程|</p>
 <p>使用odefile.m模板求解常微分方程</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function varargout = odefile(t,y,flag,p1,p2)</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> flag</span><br><span class="line"><span class="keyword">case</span> <span class="string">''</span></span><br><span class="line">    varargout&#123;1&#125; = f(t,y,p1,p2);</span><br><span class="line">case 'init'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = init(p1,p2);</span><br><span class="line">case 'jacobian'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jacobian(t,y,p1,p2);</span><br><span class="line">case 'jpattern'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jpattern(t,y,p1,p2);</span><br><span class="line">case 'mass'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = mass(t,y,p1,p2);</span><br><span class="line">case 'events'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = events(t,y,p1,p2);</span><br><span class="line">otherwise</span><br><span class="line">    error['Unknown flag'];</span><br><span class="line"><span class="built_in">end</span></span><br><span class="line"></span><br><span class="line">function dydt = f(t,y,p1,p2)</span><br><span class="line">    dydt = &lt;在此插入常微分方程&gt;;</span><br><span class="line"></span><br><span class="line">function [tspan,y0,options] = init(p1,p2)</span><br><span class="line">    tspan = &lt;在此插入求解范围&gt;;</span><br><span class="line">    y0 = &lt;在此插入初值&gt;;</span><br><span class="line">    options = &lt;在此插入选项设置，可设置为[]&gt;;</span><br><span class="line"></span><br><span class="line">function dfdy = jacobian(t,y,p1,p2)</span><br><span class="line">    dfdy = &lt;再此插入雅克比矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function S = jpattern(t,y,p1,p2)</span><br><span class="line">    S = &lt;在此插入雅克比矩阵系数模式&gt;;</span><br><span class="line"></span><br><span class="line">function M = mass(t,y,p1,p2)</span><br><span class="line">    M = &lt;在此插入质量矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function [value,isterminal,direction] = events(t,y,p1,p2)</span><br><span class="line">    value = &lt;在此插入时间向量函数&gt;;</span><br><span class="line">    isterminal = &lt;在此插入逻辑向量&gt;;</span><br><span class="line">    direction = &lt;在此插入方向向量&gt;;</span><br></pre></td></tr></table></figure>
-
       
     </div>
     <footer class="article-footer">
@@ -258,7 +261,7 @@
         
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E5%80%BC%E8%AE%A1%E7%AE%97/" rel="tag">数值计算</a></li></ul>
 
-        <a data-url="https://jychen224.github.io/2020/01/04/W4/" data-id="ck56gbara000cqwux2atxguja" class="article-share-link">分享到</a>
+        <a data-url="https://jychen224.github.io/2020/01/04/W4/" data-id="ck5c7vj18000c98uxgfp203i2" class="article-share-link">分享到</a>
         
       </div>
     </footer>
@@ -406,13 +409,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.12.0/jquery.qrcode.min.js"></script>
-
-
-  
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-
-  
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
 
 
 
