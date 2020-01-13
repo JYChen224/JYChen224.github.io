@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
+
+<script type="text/javascript"
+color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+
 <head>
   <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -26,7 +32,7 @@
     exturl: false,
     sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
     fancybox: false,
     mediumzoom: false,
@@ -137,16 +143,6 @@
     <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
@@ -155,6 +151,11 @@
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
 
   </li>
   </ul>
@@ -186,7 +187,7 @@
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/07/DDPG/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -275,7 +276,7 @@
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -415,7 +416,7 @@
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -541,7 +542,7 @@
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -719,7 +720,7 @@
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/TRPO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -864,7 +865,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/04/W4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -1077,7 +1078,7 @@ A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
     <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/05/05/1.IMU%E7%9A%84%E7%BB%84%E6%88%90%E4%B8%8E%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar2.jpg">
       <meta itemprop="name" content="JYChen">
       <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
     </span>
@@ -1263,6 +1264,8 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="JYChen"
+      src="/images/avatar2.jpg">
   <p class="site-author-name" itemprop="name">JYChen</p>
   <div class="site-description" itemprop="description">欲以究天人之际，通古今之变，成一家之言</div>
 </div>
@@ -1283,7 +1286,6 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-          
         <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -1308,7 +1310,7 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
 
 <div class="copyright">
   
-  &copy; 
+  &copy; 2019 – 
   <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
@@ -1335,6 +1337,8 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
   </div>
 
   
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
