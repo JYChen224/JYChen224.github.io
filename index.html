@@ -285,7 +285,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-13 15:33:51" itemprop="dateModified" datetime="2020-01-13T15:33:51+08:00">2020-01-13</time>
+                <time title="修改时间：2020-01-30 21:33:33" itemprop="dateModified" datetime="2020-01-30T21:33:33+08:00">2020-01-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -343,7 +343,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W3/">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/TRPO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar2.jpg">
@@ -357,7 +357,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/01/06/W3/" class="post-title-link" itemprop="url">W3</a>
+            <a href="/2020/01/06/TRPO/" class="post-title-link" itemprop="url">TRPO</a>
         </h1>
 
         <div class="post-meta">
@@ -367,15 +367,334 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-01-06 21:15:16" itemprop="dateCreated datePublished" datetime="2020-01-06T21:15:16+08:00">2020-01-06</time>
+              <time title="创建时间：2020-01-06 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-06T00:00:00+08:00">2020-01-06</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-08 18:24:55" itemprop="dateModified" datetime="2020-01-08T18:24:55+08:00">2020-01-08</time>
+                <time title="修改时间：2020-01-30 21:33:53" itemprop="dateModified" datetime="2020-01-30T21:33:53+08:00">2020-01-30</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index">
+                    <span itemprop="name">强化学习</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="trpo-trust-region-policy-optimization">TRPO-Trust Region Policy Optimization</h1>
+<h3 id="背景">背景</h3>
+<p>在策略梯度算法中，参数更新的表达式为： <span class="math display">\[\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J\]</span> 在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
+<ul>
+<li>梯度估计不准确</li>
+<li>步长参数不容易确定</li>
+</ul>
+<p>尤其当算法采用不合适的步长时，参数会更新到一个不好的策略，从而采集到的更差的样本，估计出更差的梯度，更新到更更不好的策略，如此循环，使得策略没办法提升。TRPO方法在进行梯度下降的同时，对步长加以限制，并可以自动的调整步长，在理论上确保策略的提升是非减的，这样每次策略更新的时候我们都能有信心新的策略比旧的策略要好。</p>
+<h3 id="回报函数与优势函数">回报函数与优势函数</h3>
+<p>我们用<span class="math inline">\(\pi\)</span>来表示策略，用<span class="math inline">\(\eta(\pi)\)</span>来表示策略的回报函数，即期望折扣回报： <span class="math display">\[\eta(\pi)=E_{s_0,a_0,\dots}\left[\sum_{t=0}^{\infty}\gamma^tr(s_t)\right]\quad\quad(1)\]</span> 其中<span class="math inline">\(s_{0} \sim \rho_{0}\left(s_{0}\right), a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。</p>
+<p>然后我们定义优势函数<span class="math inline">\(A_\pi(s,a)\)</span>: <span class="math display">\[
+Q_{\pi}\left(s_{t}, a_{t}\right)=\mathbb{E}_{s_{t+1}, a_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
+\]</span> <span class="math display">\[
+V_{\pi}\left(s_{t}\right)=\mathbb{E}_{a_{t}, s_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
+\]</span> <span class="math display">\[
+A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
+\]</span> 其中<span class="math inline">\(a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。 优势函数描述了动作值函数与状态值函数之间的差异，相当于Q_Learning中的<span class="math inline">\(\delta\)</span>，后面可以看到，使用优势函数可以描述两个策略之间回报函数的差异。</p>
+<h3 id="回报函数的分解">回报函数的分解</h3>
+<p><span class="math display">\[
+\eta(\tilde{\pi})=\eta(\pi)+\mathbb{E}_{s_{0}, a_{0}, \cdots \sim \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]\quad\quad(3)
+\]</span> 证明： <span class="math display">\[ \begin{aligned}
+&amp; \mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]
+\\&amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t}\left(r\left(s_{t}\right)+\gamma V_{\pi}\left(s_{t+1}\right)-V_{\pi}\left(s_{t}\right)\right)\right]
+\\ &amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[-V_{\pi}\left(s_{0}\right)+\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
+\\ &amp;=-\mathbb{E}_{s_{0}}\left[V_{\pi}\left(s_{0}\right)\right]+\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
+\\ &amp;=-\eta(\pi)+\eta(\tilde{\pi})
+\end{aligned}
+\]</span></p>
+<p>公式的第二行是优势函数的展开表达，第三行是通过错位相消化简了<span class="math inline">\(V_{\pi}\left(s\right)\)</span>,第五行是根据回报函数的定义得到，这里注意到状态值函数与回报函数存在关系：<span class="math inline">\(\eta(\pi)=E_{s_0}\left[V_{\pi}\left(s_{0}\right)\right]\)</span></p>
+<p>我们将公式（3）进行进一步的化简： <span class="math display">\[\begin{aligned} \eta(\tilde{\pi}) &amp;=\eta(\pi)+\sum_{t=0}^{\infty} \sum_{s} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) \gamma^{t} A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \sum_{t=0}^{\infty} \gamma^{t} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \rho_{\tilde{\pi}}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \end{aligned}\]</span> 其中<span class="math inline">\(\rho_{\pi}(s)=P\left(s_{0}=s\right)+\gamma P\left(s_{1}=s\right)+\gamma^{2} P\left(s_{2}=s\right)+\ldots\)</span>，表示折扣访问频率，可以理解为在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。</p>
+<p>从公式可以看出，在从一个策略优化到新的策略的时候，只要保证每个状态<span class="math inline">\(S\)</span>下，保持一个非负的advantage，即<span class="math inline">\(\sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)&gt;0\)</span>，则可以保证新的策略肯定是更好的，这样通过迭代算法可以收敛到最优的策略。</p>
+<h3 id="回报函数的近似">回报函数的近似</h3>
+<p><span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>描述了在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。此时状态s的分布由新的策略产生，对新的策略严重依赖，使得优化问题非常复杂，因此TRPO采用<span class="math inline">\(\rho_{\pi}(s)\)</span>对<span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>进行近似，从而得到新的目标函数： <span class="math display">\[L_{\pi}(\tilde{\pi})=\eta(\pi)+\sum_{s} \rho_{\pi}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)\quad\quad(4)\]</span></p>
+<p>近似目标函数与原函数之间存在如下关系： <span class="math display">\[
+\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) \\\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} &amp;=\left.\nabla_{\theta} \eta\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} \end{aligned}
+\]</span> 即<span class="math inline">\(L_{\pi}(\tilde{\pi})\)</span>是对<span class="math inline">\(\eta(\tilde{\pi})\)</span>的一阶等价近似，证明如下：</p>
+<p>对于第一个等式 <span class="math display">\[
+\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) + \sum_{s} \rho_{\pi_{\theta_{0}}}(s) \sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a) \\ \end{aligned}
+\]</span> 由于同一个策略对自身优势函数的期望为零，<span class="math inline">\(\sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a)=0\)</span>，因此第一个等式成立。</p>
+<p>对于第二个等式 <span class="math display">\[\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} =\sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
+<p><span class="math display">\[\nabla_{\theta} \eta\left(\pi_{\theta}\right)|_{\theta=\theta_{0}} = \sum_{s} \nabla_{\theta}\rho_{\pi}(s) \sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} + \sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
+<p>由于<span class="math inline">\(\sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}=0\)</span>，因此第二个等式成立。</p>
+<p>进一步，当策略更新满足如<span class="math inline">\(\pi_{\text {new }}(a | s)=(1-\alpha) \pi_{\text {old }}(a | s)+\alpha \pi^{\prime}(a | s)\)</span>时，近似函数与原目标函数存在如下关系： <span class="math display">\[
+\eta\left(\pi_{\text {new }}\right) \geq L_{\pi_{\text {old }}}\left(\pi_{\text {new }}\right)-\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \alpha^{2}
+\]</span> 或者用KL散度表示为： <span class="math display">\[
+\begin{aligned} \eta(\tilde{\pi}) &amp; \geq L_{\pi}(\tilde{\pi})-C D_{\mathrm{KL}}^{\max }(\pi, \tilde{\pi})  \\ &amp; \text { where } C=\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \end{aligned}   \quad\quad\quad\quad (5)
+\]</span></p>
+<p>公式(5)提供了<span class="math inline">\(\eta(\tilde{\pi})\)</span>的下界，我们令<span class="math inline">\(M_i(\pi)=L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>，则有： <span class="math display">\[
+\begin{array}{l}{\eta\left(\pi_{i+1}\right) \geq M_{i}\left(\pi_{i+1}\right)} \\ {\eta\left(\pi_{i}\right)=M_{i}\left(\pi_{i}\right)} \\ {\eta\left(\pi_{i+1}\right)-\eta\left(\pi_{i}\right) \geq M_{i}\left(\pi_{i+1}\right)-M\left(\pi_{i}\right)}\end{array}
+\]</span> 只要每次选择策略使得<span class="math inline">\(M_i&gt;0\)</span>，则这样的策略就是更好的策略，算法就可以收敛到最优策略。</p>
+<h3 id="优化问题的简化">优化问题的简化</h3>
+<p>从过前面的分析，我们把求解回报函数<span class="math inline">\(\eta(\pi)\)</span>最大的问题，转化为求<span class="math inline">\(\eta(\pi)\)</span>的下界函数<span class="math inline">\(L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>最大的问题，形式化为： <span class="math display">\[
+\underset{\theta}{\operatorname{maximize}}\left[L_{\theta_{\mathrm{old}}}(\theta)-C D_{\mathrm{KL}}^{\max }\left(\theta_{\mathrm{old}}, \theta\right)\right]
+\]</span> 这个优化可以看做是在目标函数<span class="math inline">\(L\)</span>的基础上，增加了一个惩罚项，即在最大化<span class="math inline">\(L\)</span>的基础上，限制每次优化的参数变化程度，其中<span class="math inline">\(C\)</span>为惩罚因子，KL散度表示参数之间的距离。但如果固定惩罚因子<span class="math inline">\(C\)</span>，则每次迭代的步长很小，因此希望自动调整<span class="math inline">\(C\)</span>的取值，这样优化问题可以转化为带约束优化的形式： <span class="math display">\[
+\begin{array}{l}{\underset{\theta}{\operatorname{maximize}} L_{\theta_{\text {old }}}(\theta)} \\ {\text { subject to } \bar{D}_{\mathrm{KL}}^{\rho_{\theta_{\text {old }}}}\left(\theta_{\text {old }}, \theta\right) \leq \delta}\end{array} \quad\quad\quad\quad (6)
+\]</span></p>
+<p>进一步，我们将目标函数一阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行一阶泰勒展开： <span class="math display">\[L_{\theta_{\text {old }}}(\theta)\doteq \left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)
+\]</span> 将约束条件进行二阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行二阶泰勒展开 <span class="math display">\[
+\begin{aligned}
+&amp; D_{KL}(\pi_{\theta_{old}}(\cdot|s)||\pi_{\theta}(\cdot|s)) \\
+&amp; = E_{x\sim\pi_{old}}log\pi_{\theta_{old}} - E_{x\sim\pi_{old}}log\pi_{\theta} \\
+&amp; \approx E_{\theta_{old}}[log\pi_{\theta_{old}}] - (E_{\theta_{old}}[log\pi_{\theta_{old}}] + E_{\theta_{old}}[\nabla log\pi_{\theta_{old}}]\Delta\theta+\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta)\\
+&amp; = -\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta
+\end{aligned}
+\]</span> 其中最后一步的等式由于<span class="math inline">\(log\pi_{\theta_{old}}\)</span>为极点，<span class="math inline">\(\nabla log\pi_{\theta_{old}}=0\)</span>。</p>
+<p>令<span class="math inline">\(A = E_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\)</span>，则优化问题最终可描述为： <span class="math display">\[
+\begin{array}{l}{\underset{\theta}{\operatorname{maximize}}\left[\left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)\right]} \\ {\text { subject to } \frac{1}{2}\left(\theta_{\text {old }}-\theta\right)^{T} A\left(\theta_{\text {old }}\right)\left(\theta_{\text {old }}-\theta\right) \leq \delta}\end{array}
+\]</span></p>
+<h3 id="小结">小结</h3>
+<p>在梯度上升法中，我们判断最陡峭的方向，之后朝着那个方向前进。但是如果学习率太高的话，这样的优化也许会远离真正的最优策略。在TRPO中，我们用 δ 变量来限制我们的搜索区域，这样的区域可以保证在它达到局部或者全局最优策略之前，它的优化策略将会优于当前策略，从而使算法稳定的收敛到一个最优策略。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/03/W4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar2.jpg">
+      <meta itemprop="name" content="JYChen">
+      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JYChen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/01/03/W4/" class="post-title-link" itemprop="url">数值计算基础</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-03 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-03T00:00:00+08:00">2020-01-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-30 21:39:49" itemprop="dateModified" datetime="2020-01-30T21:39:49+08:00">2020-01-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index">
+                    <span itemprop="name">数学</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="数据插值">数据插值</h3>
+<ul>
+<li>工具箱：cftool + Code Generation</li>
+<li>函 数：fit</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fitobject = fit(x,y,fitType)</span><br><span class="line">fitobject = fit([x,y],z,fitType)</span><br><span class="line">&lt;fitType -- cflibhelp&gt;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr class="header">
+<th>FitType</th>
+<th>Equation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>poly1</td>
+<td>Y = p1*x+p2</td>
+</tr>
+<tr class="even">
+<td>poly2</td>
+<td>Y = p1<em>x^2+p2</em>x+p3</td>
+</tr>
+<tr class="odd">
+<td>poly21</td>
+<td>Z = p00 + p10<em>x + p01</em>y + p20<em>x^2 + p11</em>x*y</td>
+</tr>
+<tr class="even">
+<td>poly13</td>
+<td>Z = p00 + p10<em>x + p01</em>y + p11<em>x</em>y + p02<em>y^2 + p12</em>x<em>y^2 + p03</em>y^3</td>
+</tr>
+<tr class="odd">
+<td>weibull</td>
+<td>Y = a<em>b</em>x<sup>(b-1)<em>exp(-a</em>x</sup>b)</td>
+</tr>
+<tr class="even">
+<td>exp1</td>
+<td>Y = a<em>exp(b</em>x)</td>
+</tr>
+<tr class="odd">
+<td>exp2</td>
+<td>Y = a<em>exp(b</em>x)+c<em>exp(d</em>x)</td>
+</tr>
+<tr class="even">
+<td>fourier1</td>
+<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)</td>
+</tr>
+<tr class="odd">
+<td>fourier2</td>
+<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)... +a2<em>cos(2</em>x<em>p)+b2</em>sin(2<em>x</em>p)</td>
+</tr>
+<tr class="even">
+<td>gauss1</td>
+<td>Y = a1*exp(-((x-b1)/c1)^2)</td>
+</tr>
+<tr class="odd">
+<td>gauss2</td>
+<td>Y = a1<em>exp(-((x-b1)/c1)^2)+a2</em>... exp(-((x-b2)/c2)^2)</td>
+</tr>
+<tr class="even">
+<td>power1</td>
+<td>Y = a*x^b</td>
+</tr>
+<tr class="odd">
+<td>power2</td>
+<td>Y = a*x^b+c</td>
+</tr>
+<tr class="even">
+<td>rat02</td>
+<td>Y = (p1)/(x^2+q1*x+q2)</td>
+</tr>
+<tr class="odd">
+<td>rat21</td>
+<td>Y = (p1<em>x^2+p2</em>x+p3)/(x+q1)</td>
+</tr>
+<tr class="even">
+<td>sin1</td>
+<td>Y = a1<em>sin(b1</em>x+c1)</td>
+</tr>
+<tr class="odd">
+<td>sin2</td>
+<td>Y = a1<em>sin(b1</em>x+c1)+a2<em>sin... (b2</em>x+c2)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="数值积分">数值积分</h3>
+<p>常微分方程求解器比较 |求解器|刚性|算法|应用差场合| |--- |--- |--- |--- | |ode45|非刚性|单步，4-5阶龙格-库塔|首选，大多数场合| |ode23|非刚性|单步，2-3阶龙格-库塔|精度较低场合| |ode113|非刚性|多步，1-13阶Adams算法|若ode45计算时间长，尝试ode113| |ode15s|刚性|多步，Gear's反向数值积分|存在质量矩阵时| |ode23s|刚性|单步，2阶Rosenbrock算法|低精度或存在质量矩阵时| |ode23t|中等刚性|梯形算法|中等刚度问题| |ode23tb|刚性|梯形-反向数值微分两阶段算法|低精度或存在质量矩阵| |ode15i|完全隐式|可以求解完全隐式的常微分方程|完全隐式方程|</p>
+<p>使用odefile.m模板求解常微分方程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function varargout = odefile(t,y,flag,p1,p2)</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> flag</span><br><span class="line"><span class="keyword">case</span> <span class="string">''</span></span><br><span class="line">    varargout&#123;1&#125; = f(t,y,p1,p2);</span><br><span class="line">case 'init'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = init(p1,p2);</span><br><span class="line">case 'jacobian'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jacobian(t,y,p1,p2);</span><br><span class="line">case 'jpattern'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jpattern(t,y,p1,p2);</span><br><span class="line">case 'mass'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = mass(t,y,p1,p2);</span><br><span class="line">case 'events'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = events(t,y,p1,p2);</span><br><span class="line">otherwise</span><br><span class="line">    error['Unknown flag'];</span><br><span class="line"><span class="built_in">end</span></span><br><span class="line"></span><br><span class="line">function dydt = f(t,y,p1,p2)</span><br><span class="line">    dydt = &lt;在此插入常微分方程&gt;;</span><br><span class="line"></span><br><span class="line">function [tspan,y0,options] = init(p1,p2)</span><br><span class="line">    tspan = &lt;在此插入求解范围&gt;;</span><br><span class="line">    y0 = &lt;在此插入初值&gt;;</span><br><span class="line">    options = &lt;在此插入选项设置，可设置为[]&gt;;</span><br><span class="line"></span><br><span class="line">function dfdy = jacobian(t,y,p1,p2)</span><br><span class="line">    dfdy = &lt;再此插入雅克比矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function S = jpattern(t,y,p1,p2)</span><br><span class="line">    S = &lt;在此插入雅克比矩阵系数模式&gt;;</span><br><span class="line"></span><br><span class="line">function M = mass(t,y,p1,p2)</span><br><span class="line">    M = &lt;在此插入质量矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function [value,isterminal,direction] = events(t,y,p1,p2)</span><br><span class="line">    value = &lt;在此插入时间向量函数&gt;;</span><br><span class="line">    isterminal = &lt;在此插入逻辑向量&gt;;</span><br><span class="line">    direction = &lt;在此插入方向向量&gt;;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/11/01/W3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar2.jpg">
+      <meta itemprop="name" content="JYChen">
+      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JYChen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/01/W3/" class="post-title-link" itemprop="url">W3</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-01T00:00:00+08:00">2019-11-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-30 21:35:10" itemprop="dateModified" datetime="2020-01-30T21:35:10+08:00">2020-01-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析</span>
+                  </a>
+                </span>
+            </span>
 
           
 
@@ -483,7 +802,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W2/">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/10/01/W1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar2.jpg">
@@ -497,7 +816,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/01/06/W2/" class="post-title-link" itemprop="url">W2</a>
+            <a href="/2019/10/01/W1/" class="post-title-link" itemprop="url">W1</a>
         </h1>
 
         <div class="post-meta">
@@ -507,141 +826,26 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-01-06 21:15:16" itemprop="dateCreated datePublished" datetime="2020-01-06T21:15:16+08:00">2020-01-06</time>
+              <time title="创建时间：2019-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-01T00:00:00+08:00">2019-10-01</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 13:08:02" itemprop="dateModified" datetime="2019-11-29T13:08:02+08:00">2019-11-29</time>
+                <time title="修改时间：2020-01-30 21:35:58" itemprop="dateModified" datetime="2020-01-30T21:35:58+08:00">2020-01-30</time>
               </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="混合控制中的平滑切换问题">混合控制中的平滑切换问题</h3>
-<p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
-<p>如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
-<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即<span class="math inline">\(vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}\)</span>。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图1 电机控制指令关于步态周期的曲线
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图2 加入过渡阶段的控制时序
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020220136408.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图3 平滑切换策略下，电机控制指令关于步态周期的曲线
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-<h3 id="助力过程鲍登线的长度变化">助力过程鲍登线的长度变化</h3>
-<p>在安装踝关节编码器后，可以基于踝关节角度和电机角度对鲍登线-弹簧的长度变化和刚度系数进行分析。 首先基于力矩控制实验的数据，我们计算了在峰值力矩为<span class="math inline">\(35N\cdot m\)</span>时，鲍登线（弹簧）长度的变化（<span class="math inline">\(\theta_m - \theta_aR\)</span>）与测量力矩的关系曲线，如图4所示，其中彩色曲线为60步的平均曲线，蓝色端表示步态开始，黄色端表示步态结束。由图可以看出，尽管曲线存在明显的非线性（死区：长度变化较小时力矩没有变化的问题，迟滞：力矩上升和下降时曲线不一致），但这些非线性似乎是确定的，而且鲍登线与弹簧整体的刚度系数（曲线斜率）似乎保是一个常数。若这种现象在力矩变化的时候也成立，或许可以考虑对非线性过程建模，从而设计更复杂的控制器。</p>
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020221102842.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图4 峰值力矩为$35N\cdot m$时，等效弹簧长度的变化与交互力矩的关系
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-<p>之后我们进行了进一步的实验，将峰值力矩从为<span class="math inline">\(35N\cdot m\)</span>逐渐增加到<span class="math inline">\(60N\cdot m\)</span>。在变化的过程中，鲍登线（弹簧）长度的变化与交互力矩的关系如图1.13所示，其中蓝色曲线代表峰值力矩较小的情况，黄色曲线代表峰值力矩较大的情况。在这个实验中，虽然鲍登线与弹簧整体的刚度系数仍保持着固定常数关系，但非线性情况发生了明显变化:随着峰值力矩的增加，曲线整体向右移动。这或许是由于较大的峰值力矩导致鲍登线整体被拉长，使得非线性的死区阈值发生了变化。图1.14,鲍登线（弹簧）长度变化关于步态周期的曲线也能够佐证这一观点，在较大的拉力作用下，鲍登线整体被拉长了约1cm。 此实验结果强调了对鲍登绳进行最大力矩完全拉伸实验的重要性。关于鲍登绳完全拉伸后的长度与交互力矩关系，后续实验会继续进行研究。</p>
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020221353229.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图5 峰值力矩变化时，等效弹簧长度的变化与交互力矩的关系
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/W1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar2.jpg">
-      <meta itemprop="name" content="JYChen">
-      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JYChen">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/01/06/W1/" class="post-title-link" itemprop="url">W1</a>
-        </h1>
-
-        <div class="post-meta">
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="fa fa-folder-o"></i>
               </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-01-06 21:15:16" itemprop="dateCreated datePublished" datetime="2020-01-06T21:15:16+08:00">2020-01-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析</span>
+                  </a>
                 </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-29 13:07:17" itemprop="dateModified" datetime="2019-11-29T13:07:17+08:00">2019-11-29</time>
-              </span>
+            </span>
 
           
 
@@ -787,7 +991,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/06/TRPO/">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/10/01/W2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar2.jpg">
@@ -801,7 +1005,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2020/01/06/TRPO/" class="post-title-link" itemprop="url">TRPO</a>
+            <a href="/2019/10/01/W2/" class="post-title-link" itemprop="url">W2</a>
         </h1>
 
         <div class="post-meta">
@@ -811,14 +1015,14 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-01-06 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-06T00:00:00+08:00">2020-01-06</time>
+              <time title="创建时间：2019-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-01T00:00:00+08:00">2019-10-01</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-09 16:18:20" itemprop="dateModified" datetime="2020-01-09T16:18:20+08:00">2020-01-09</time>
+                <time title="修改时间：2020-01-30 21:35:39" itemprop="dateModified" datetime="2020-01-30T21:35:39+08:00">2020-01-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -826,8 +1030,8 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index">
-                    <span itemprop="name">强化学习</span>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析</span>
                   </a>
                 </span>
             </span>
@@ -843,289 +1047,68 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="trpo-trust-region-policy-optimization">TRPO-Trust Region Policy Optimization</h1>
-<h3 id="背景">背景</h3>
-<p>在策略梯度算法中，参数更新的表达式为： <span class="math display">\[\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J\]</span> 在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
-<ul>
-<li>梯度估计不准确</li>
-<li>步长参数不容易确定</li>
-</ul>
-<p>尤其当算法采用不合适的步长时，参数会更新到一个不好的策略，从而采集到的更差的样本，估计出更差的梯度，更新到更更不好的策略，如此循环，使得策略没办法提升。TRPO方法在进行梯度下降的同时，对步长加以限制，并可以自动的调整步长，在理论上确保策略的提升是非减的，这样每次策略更新的时候我们都能有信心新的策略比旧的策略要好。</p>
-<h3 id="回报函数与优势函数">回报函数与优势函数</h3>
-<p>我们用<span class="math inline">\(\pi\)</span>来表示策略，用<span class="math inline">\(\eta(\pi)\)</span>来表示策略的回报函数，即期望折扣回报： <span class="math display">\[\eta(\pi)=E_{s_0,a_0,\dots}\left[\sum_{t=0}^{\infty}\gamma^tr(s_t)\right]\quad\quad(1)\]</span> 其中<span class="math inline">\(s_{0} \sim \rho_{0}\left(s_{0}\right), a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。</p>
-<p>然后我们定义优势函数<span class="math inline">\(A_\pi(s,a)\)</span>: <span class="math display">\[
-Q_{\pi}\left(s_{t}, a_{t}\right)=\mathbb{E}_{s_{t+1}, a_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
-\]</span> <span class="math display">\[
-V_{\pi}\left(s_{t}\right)=\mathbb{E}_{a_{t}, s_{t+1}, \ldots}\left[\sum_{l=0}^{\infty} \gamma^{l} r\left(s_{t+l}\right)\right]
-\]</span> <span class="math display">\[
-A_{\pi}(s, a)=Q_{\pi}(s, a)-V_{\pi}(s)\quad\quad(2)
-\]</span> 其中<span class="math inline">\(a_{t} \sim \pi\left(a_{t} | s_{t}\right), s_{t+1} \sim P\left(s_{t+1} | s_{t}, a_{t}\right)\)</span>。 优势函数描述了动作值函数与状态值函数之间的差异，相当于Q_Learning中的<span class="math inline">\(\delta\)</span>，后面可以看到，使用优势函数可以描述两个策略之间回报函数的差异。</p>
-<h3 id="回报函数的分解">回报函数的分解</h3>
-<p><span class="math display">\[
-\eta(\tilde{\pi})=\eta(\pi)+\mathbb{E}_{s_{0}, a_{0}, \cdots \sim \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]\quad\quad(3)
-\]</span> 证明： <span class="math display">\[ \begin{aligned}
-&amp; \mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} A_{\pi}\left(s_{t}, a_{t}\right)\right]
-\\&amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t}\left(r\left(s_{t}\right)+\gamma V_{\pi}\left(s_{t+1}\right)-V_{\pi}\left(s_{t}\right)\right)\right]
-\\ &amp;=\mathbb{E}_{\tau | \tilde{\pi}}\left[-V_{\pi}\left(s_{0}\right)+\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
-\\ &amp;=-\mathbb{E}_{s_{0}}\left[V_{\pi}\left(s_{0}\right)\right]+\mathbb{E}_{\tau | \tilde{\pi}}\left[\sum_{t=0}^{\infty} \gamma^{t} r\left(s_{t}\right)\right]
-\\ &amp;=-\eta(\pi)+\eta(\tilde{\pi})
-\end{aligned}
-\]</span></p>
-<p>公式的第二行是优势函数的展开表达，第三行是通过错位相消化简了<span class="math inline">\(V_{\pi}\left(s\right)\)</span>,第五行是根据回报函数的定义得到，这里注意到状态值函数与回报函数存在关系：<span class="math inline">\(\eta(\pi)=E_{s_0}\left[V_{\pi}\left(s_{0}\right)\right]\)</span></p>
-<p>我们将公式（3）进行进一步的化简： <span class="math display">\[\begin{aligned} \eta(\tilde{\pi}) &amp;=\eta(\pi)+\sum_{t=0}^{\infty} \sum_{s} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) \gamma^{t} A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \sum_{t=0}^{\infty} \gamma^{t} P\left(s_{t}=s | \tilde{\pi}\right) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \\ &amp;=\eta(\pi)+\sum_{s} \rho_{\tilde{\pi}}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a) \end{aligned}\]</span> 其中<span class="math inline">\(\rho_{\pi}(s)=P\left(s_{0}=s\right)+\gamma P\left(s_{1}=s\right)+\gamma^{2} P\left(s_{2}=s\right)+\ldots\)</span>，表示折扣访问频率，可以理解为在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。</p>
-<p>从公式可以看出，在从一个策略优化到新的策略的时候，只要保证每个状态<span class="math inline">\(S\)</span>下，保持一个非负的advantage，即<span class="math inline">\(\sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)&gt;0\)</span>，则可以保证新的策略肯定是更好的，这样通过迭代算法可以收敛到最优的策略。</p>
-<h3 id="回报函数的近似">回报函数的近似</h3>
-<p><span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>描述了在策略<span class="math inline">\(\tilde{\pi}\)</span>下，状态的分布。此时状态s的分布由新的策略产生，对新的策略严重依赖，使得优化问题非常复杂，因此TRPO采用<span class="math inline">\(\rho_{\pi}(s)\)</span>对<span class="math inline">\(\rho_{\tilde{\pi}}(s)\)</span>进行近似，从而得到新的目标函数： <span class="math display">\[L_{\pi}(\tilde{\pi})=\eta(\pi)+\sum_{s} \rho_{\pi}(s) \sum_{a} \tilde{\pi}(a | s) A_{\pi}(s, a)\quad\quad(4)\]</span></p>
-<p>近似目标函数与原函数之间存在如下关系： <span class="math display">\[
-\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) \\\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} &amp;=\left.\nabla_{\theta} \eta\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} \end{aligned}
-\]</span> 即<span class="math inline">\(L_{\pi}(\tilde{\pi})\)</span>是对<span class="math inline">\(\eta(\tilde{\pi})\)</span>的一阶等价近似，证明如下：</p>
-<p>对于第一个等式 <span class="math display">\[
-\begin{aligned} L_{\pi_{\theta_{0}}}\left(\pi_{\theta_{0}}\right) &amp;=\eta\left(\pi_{\theta_{0}}\right) + \sum_{s} \rho_{\pi_{\theta_{0}}}(s) \sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a) \\ \end{aligned}
-\]</span> 由于同一个策略对自身优势函数的期望为零，<span class="math inline">\(\sum_{a} \pi_{\theta_{0}}(a | s) A_{\pi_{\theta_{0}}}(s, a)=0\)</span>，因此第一个等式成立。</p>
-<p>对于第二个等式 <span class="math display">\[\left.\nabla_{\theta} L_{\pi_{\theta_{0}}}\left(\pi_{\theta}\right)\right|_{\theta=\theta_{0}} =\sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
-<p><span class="math display">\[\nabla_{\theta} \eta\left(\pi_{\theta}\right)|_{\theta=\theta_{0}} = \sum_{s} \nabla_{\theta}\rho_{\pi}(s) \sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} + \sum_{s} \rho_{\pi}(s) \sum_{a} \nabla_{\theta}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}} \]</span></p>
-<p>由于<span class="math inline">\(\sum_{a}{\pi}(a | s) A_{\pi}(s, a)|_{\theta=\theta_{0}}=0\)</span>，因此第二个等式成立。</p>
-<p>进一步，当策略更新满足如<span class="math inline">\(\pi_{\text {new }}(a | s)=(1-\alpha) \pi_{\text {old }}(a | s)+\alpha \pi^{\prime}(a | s)\)</span>时，近似函数与原目标函数存在如下关系： <span class="math display">\[
-\eta\left(\pi_{\text {new }}\right) \geq L_{\pi_{\text {old }}}\left(\pi_{\text {new }}\right)-\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \alpha^{2}
-\]</span> 或者用KL散度表示为： <span class="math display">\[
-\begin{aligned} \eta(\tilde{\pi}) &amp; \geq L_{\pi}(\tilde{\pi})-C D_{\mathrm{KL}}^{\max }(\pi, \tilde{\pi})  \\ &amp; \text { where } C=\frac{2 \epsilon \gamma}{(1-\gamma)^{2}} \end{aligned}   \quad\quad\quad\quad (5)
-\]</span></p>
-<p>公式(5)提供了<span class="math inline">\(\eta(\tilde{\pi})\)</span>的下界，我们令<span class="math inline">\(M_i(\pi)=L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>，则有： <span class="math display">\[
-\begin{array}{l}{\eta\left(\pi_{i+1}\right) \geq M_{i}\left(\pi_{i+1}\right)} \\ {\eta\left(\pi_{i}\right)=M_{i}\left(\pi_{i}\right)} \\ {\eta\left(\pi_{i+1}\right)-\eta\left(\pi_{i}\right) \geq M_{i}\left(\pi_{i+1}\right)-M\left(\pi_{i}\right)}\end{array}
-\]</span> 只要每次选择策略使得<span class="math inline">\(M_i&gt;0\)</span>，则这样的策略就是更好的策略，算法就可以收敛到最优策略。</p>
-<h3 id="优化问题的简化">优化问题的简化</h3>
-<p>从过前面的分析，我们把求解回报函数<span class="math inline">\(\eta(\pi)\)</span>最大的问题，转化为求<span class="math inline">\(\eta(\pi)\)</span>的下界函数<span class="math inline">\(L_{\pi_{i}}(\pi)-C D_{\mathrm{KL}}^{\max }\left(\pi_{i}, \pi\right)\)</span>最大的问题，形式化为： <span class="math display">\[
-\underset{\theta}{\operatorname{maximize}}\left[L_{\theta_{\mathrm{old}}}(\theta)-C D_{\mathrm{KL}}^{\max }\left(\theta_{\mathrm{old}}, \theta\right)\right]
-\]</span> 这个优化可以看做是在目标函数<span class="math inline">\(L\)</span>的基础上，增加了一个惩罚项，即在最大化<span class="math inline">\(L\)</span>的基础上，限制每次优化的参数变化程度，其中<span class="math inline">\(C\)</span>为惩罚因子，KL散度表示参数之间的距离。但如果固定惩罚因子<span class="math inline">\(C\)</span>，则每次迭代的步长很小，因此希望自动调整<span class="math inline">\(C\)</span>的取值，这样优化问题可以转化为带约束优化的形式： <span class="math display">\[
-\begin{array}{l}{\underset{\theta}{\operatorname{maximize}} L_{\theta_{\text {old }}}(\theta)} \\ {\text { subject to } \bar{D}_{\mathrm{KL}}^{\rho_{\theta_{\text {old }}}}\left(\theta_{\text {old }}, \theta\right) \leq \delta}\end{array} \quad\quad\quad\quad (6)
-\]</span></p>
-<p>进一步，我们将目标函数一阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行一阶泰勒展开： <span class="math display">\[L_{\theta_{\text {old }}}(\theta)\doteq \left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)
-\]</span> 将约束条件进行二阶逼近，在<span class="math inline">\(\theta_{\text {old }}\)</span>进行二阶泰勒展开 <span class="math display">\[
-\begin{aligned}
-&amp; D_{KL}(\pi_{\theta_{old}}(\cdot|s)||\pi_{\theta}(\cdot|s)) \\
-&amp; = E_{x\sim\pi_{old}}log\pi_{\theta_{old}} - E_{x\sim\pi_{old}}log\pi_{\theta} \\
-&amp; \approx E_{\theta_{old}}[log\pi_{\theta_{old}}] - (E_{\theta_{old}}[log\pi_{\theta_{old}}] + E_{\theta_{old}}[\nabla log\pi_{\theta_{old}}]\Delta\theta+\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta)\\
-&amp; = -\frac{1}{2}\Delta\theta^TE_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\Delta\theta
-\end{aligned}
-\]</span> 其中最后一步的等式由于<span class="math inline">\(log\pi_{\theta_{old}}\)</span>为极点，<span class="math inline">\(\nabla log\pi_{\theta_{old}}=0\)</span>。</p>
-<p>令<span class="math inline">\(A = E_{\theta_{old}}[\nabla^2 log\pi_{\theta_{old}}]\)</span>，则优化问题最终可描述为： <span class="math display">\[
-\begin{array}{l}{\underset{\theta}{\operatorname{maximize}}\left[\left.\nabla_{\theta} L_{\theta_{\text {old }}}(\theta)\right|_{\theta=\theta_{\text {old }}} \cdot\left(\theta-\theta_{\text {old }}\right)\right]} \\ {\text { subject to } \frac{1}{2}\left(\theta_{\text {old }}-\theta\right)^{T} A\left(\theta_{\text {old }}\right)\left(\theta_{\text {old }}-\theta\right) \leq \delta}\end{array}
-\]</span></p>
-<h3 id="小结">小结</h3>
-<p>在梯度上升法中，我们判断最陡峭的方向，之后朝着那个方向前进。但是如果学习率太高的话，这样的优化也许会远离真正的最优策略。在TRPO中，我们用 δ 变量来限制我们的搜索区域，这样的区域可以保证在它达到局部或者全局最优策略之前，它的优化策略将会优于当前策略，从而使算法稳定的收敛到一个最优策略。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2020/01/04/W4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar2.jpg">
-      <meta itemprop="name" content="JYChen">
-      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JYChen">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/01/04/W4/" class="post-title-link" itemprop="url">数值计算基础</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-01-04 00:00:00" itemprop="dateCreated datePublished" datetime="2020-01-04T00:00:00+08:00">2020-01-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-08 18:24:48" itemprop="dateModified" datetime="2020-01-08T18:24:48+08:00">2020-01-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index">
-                    <span itemprop="name">数学</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="数据插值">### 数据插值</h2>
-<p>数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。 使用最多的为三次样条插值。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">yi = spline(x,y,xi)</span><br><span class="line">pp = spline(x,y)</span><br><span class="line">pp = csape(x,y,conds,valconds)</span><br><span class="line">    valconds: </span><br><span class="line">        'complete'          固定边界条件</span><br><span class="line">        'not-a-knot'        非扭结边界条件（默认）</span><br><span class="line">        'periodic'          周期边界条件</span><br><span class="line">        'second'            自由边界条件</span><br><span class="line">        'variational'       自然边界条件</span><br></pre></td></tr></table></figure>
-<h2 id="数据拟合">### 数据拟合</h2>
-<ul>
-<li>工具箱：cftool + Code Generation</li>
-<li>函 数：fit</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fitobject = fit(x,y,fitType)</span><br><span class="line">fitobject = fit([x,y],z,fitType)</span><br><span class="line">&lt;fitType -- cflibhelp&gt;</span><br></pre></td></tr></table></figure>
+          <h3 id="混合控制中的平滑切换问题">混合控制中的平滑切换问题</h3>
+<p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
+<p>如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
+<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即<span class="math inline">\(vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}\)</span>。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
 <table>
-<thead>
-<tr class="header">
-<th>FitType</th>
-<th>Equation</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>poly1</td>
-<td>Y = p1*x+p2</td>
-</tr>
-<tr class="even">
-<td>poly2</td>
-<td>Y = p1<em>x^2+p2</em>x+p3</td>
-</tr>
-<tr class="odd">
-<td>poly21</td>
-<td>Z = p00 + p10<em>x + p01</em>y + p20<em>x^2 + p11</em>x*y</td>
-</tr>
-<tr class="even">
-<td>poly13</td>
-<td>Z = p00 + p10<em>x + p01</em>y + p11<em>x</em>y + p02<em>y^2 + p12</em>x<em>y^2 + p03</em>y^3</td>
-</tr>
-<tr class="odd">
-<td>weibull</td>
-<td>Y = a<em>b</em>x<sup>(b-1)<em>exp(-a</em>x</sup>b)</td>
-</tr>
-<tr class="even">
-<td>exp1</td>
-<td>Y = a<em>exp(b</em>x)</td>
-</tr>
-<tr class="odd">
-<td>exp2</td>
-<td>Y = a<em>exp(b</em>x)+c<em>exp(d</em>x)</td>
-</tr>
-<tr class="even">
-<td>fourier1</td>
-<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)</td>
-</tr>
-<tr class="odd">
-<td>fourier2</td>
-<td>Y = a0+a1<em>cos(x</em>p)+b1<em>sin(x</em>p)... +a2<em>cos(2</em>x<em>p)+b2</em>sin(2<em>x</em>p)</td>
-</tr>
-<tr class="even">
-<td>gauss1</td>
-<td>Y = a1*exp(-((x-b1)/c1)^2)</td>
-</tr>
-<tr class="odd">
-<td>gauss2</td>
-<td>Y = a1<em>exp(-((x-b1)/c1)^2)+a2</em>... exp(-((x-b2)/c2)^2)</td>
-</tr>
-<tr class="even">
-<td>power1</td>
-<td>Y = a*x^b</td>
-</tr>
-<tr class="odd">
-<td>power2</td>
-<td>Y = a*x^b+c</td>
-</tr>
-<tr class="even">
-<td>rat02</td>
-<td>Y = (p1)/(x^2+q1*x+q2)</td>
-</tr>
-<tr class="odd">
-<td>rat21</td>
-<td>Y = (p1<em>x^2+p2</em>x+p3)/(x+q1)</td>
-</tr>
-<tr class="even">
-<td>sin1</td>
-<td>Y = a1<em>sin(b1</em>x+c1)</td>
-</tr>
-<tr class="odd">
-<td>sin2</td>
-<td>Y = a1<em>sin(b1</em>x+c1)+a2<em>sin... (b2</em>x+c2)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="数值积分">### 数值积分</h2>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图1 电机控制指令关于步态周期的曲线
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
 <table>
-<thead>
-<tr class="header">
-<th>函数</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>int</td>
-<td>符号函数</td>
-</tr>
-<tr class="even">
-<td>trapz</td>
-<td>非函数表达式梯形积分</td>
-</tr>
-<tr class="odd">
-<td>quad</td>
-<td>自适应Simpson积分，对非光滑函数最为有效的地低阶积分</td>
-</tr>
-<tr class="even">
-<td>quadl</td>
-<td>适用于光滑函数，在高精度时比quad更有效</td>
-</tr>
-<tr class="odd">
-<td>quadgk</td>
-<td>对震荡的被积函数最有效，支持无限区间积分，允许积分区间短点有若的奇异性</td>
-</tr>
-<tr class="even">
-<td>quadv</td>
-<td>quad积分函数的向量化版本</td>
-</tr>
-<tr class="odd">
-<td>quad2d</td>
-<td>平面区域的二重积分，为通用的二重积分，可以做变上限、下限积分</td>
-</tr>
-<tr class="even">
-<td>dblquad</td>
-<td>矩形区域的二重积分</td>
-</tr>
-<tr class="odd">
-<td>triplequad</td>
-<td>长方体区域的三重积分</td>
-</tr>
-</tbody>
-</table>
-<h2 id="常微分方程">### 常微分方程</h2>
-<p>常微分方程求解器比较 |求解器|刚性|算法|应用差场合| |--- |--- |--- |--- | |ode45|非刚性|单步，4-5阶龙格-库塔|首选，大多数场合| |ode23|非刚性|单步，2-3阶龙格-库塔|精度较低场合| |ode113|非刚性|多步，1-13阶Adams算法|若ode45计算时间长，尝试ode113| |ode15s|刚性|多步，Gear's反向数值积分|存在质量矩阵时| |ode23s|刚性|单步，2阶Rosenbrock算法|低精度或存在质量矩阵时| |ode23t|中等刚性|梯形算法|中等刚度问题| |ode23tb|刚性|梯形-反向数值微分两阶段算法|低精度或存在质量矩阵| |ode15i|完全隐式|可以求解完全隐式的常微分方程|完全隐式方程|</p>
-<p>使用odefile.m模板求解常微分方程</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function varargout = odefile(t,y,flag,p1,p2)</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> flag</span><br><span class="line"><span class="keyword">case</span> <span class="string">''</span></span><br><span class="line">    varargout&#123;1&#125; = f(t,y,p1,p2);</span><br><span class="line">case 'init'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = init(p1,p2);</span><br><span class="line">case 'jacobian'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jacobian(t,y,p1,p2);</span><br><span class="line">case 'jpattern'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = jpattern(t,y,p1,p2);</span><br><span class="line">case 'mass'</span><br><span class="line">    varargout&#123;<span class="number">1</span>&#125; = mass(t,y,p1,p2);</span><br><span class="line">case 'events'</span><br><span class="line">    [varargout&#123;<span class="number">1</span>:<span class="number">3</span>&#125;] = events(t,y,p1,p2);</span><br><span class="line">otherwise</span><br><span class="line">    error['Unknown flag'];</span><br><span class="line"><span class="built_in">end</span></span><br><span class="line"></span><br><span class="line">function dydt = f(t,y,p1,p2)</span><br><span class="line">    dydt = &lt;在此插入常微分方程&gt;;</span><br><span class="line"></span><br><span class="line">function [tspan,y0,options] = init(p1,p2)</span><br><span class="line">    tspan = &lt;在此插入求解范围&gt;;</span><br><span class="line">    y0 = &lt;在此插入初值&gt;;</span><br><span class="line">    options = &lt;在此插入选项设置，可设置为[]&gt;;</span><br><span class="line"></span><br><span class="line">function dfdy = jacobian(t,y,p1,p2)</span><br><span class="line">    dfdy = &lt;再此插入雅克比矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function S = jpattern(t,y,p1,p2)</span><br><span class="line">    S = &lt;在此插入雅克比矩阵系数模式&gt;;</span><br><span class="line"></span><br><span class="line">function M = mass(t,y,p1,p2)</span><br><span class="line">    M = &lt;在此插入质量矩阵&gt;;</span><br><span class="line"></span><br><span class="line">function [value,isterminal,direction] = events(t,y,p1,p2)</span><br><span class="line">    value = &lt;在此插入时间向量函数&gt;;</span><br><span class="line">    isterminal = &lt;在此插入逻辑向量&gt;;</span><br><span class="line">    direction = &lt;在此插入方向向量&gt;;</span><br></pre></td></tr></table></figure>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图2 加入过渡阶段的控制时序
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
+<table>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020220136408.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图3 平滑切换策略下，电机控制指令关于步态周期的曲线
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
+<h3 id="助力过程鲍登线的长度变化">助力过程鲍登线的长度变化</h3>
+<p>在安装踝关节编码器后，可以基于踝关节角度和电机角度对鲍登线-弹簧的长度变化和刚度系数进行分析。 首先基于力矩控制实验的数据，我们计算了在峰值力矩为<span class="math inline">\(35N\cdot m\)</span>时，鲍登线（弹簧）长度的变化（<span class="math inline">\(\theta_m - \theta_aR\)</span>）与测量力矩的关系曲线，如图4所示，其中彩色曲线为60步的平均曲线，蓝色端表示步态开始，黄色端表示步态结束。由图可以看出，尽管曲线存在明显的非线性（死区：长度变化较小时力矩没有变化的问题，迟滞：力矩上升和下降时曲线不一致），但这些非线性似乎是确定的，而且鲍登线与弹簧整体的刚度系数（曲线斜率）似乎保是一个常数。若这种现象在力矩变化的时候也成立，或许可以考虑对非线性过程建模，从而设计更复杂的控制器。</p>
+<table>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020221102842.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图4 峰值力矩为$35N\cdot m$时，等效弹簧长度的变化与交互力矩的关系
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
+<p>之后我们进行了进一步的实验，将峰值力矩从为<span class="math inline">\(35N\cdot m\)</span>逐渐增加到<span class="math inline">\(60N\cdot m\)</span>。在变化的过程中，鲍登线（弹簧）长度的变化与交互力矩的关系如图1.13所示，其中蓝色曲线代表峰值力矩较小的情况，黄色曲线代表峰值力矩较大的情况。在这个实验中，虽然鲍登线与弹簧整体的刚度系数仍保持着固定常数关系，但非线性情况发生了明显变化:随着峰值力矩的增加，曲线整体向右移动。这或许是由于较大的峰值力矩导致鲍登线整体被拉长，使得非线性的死区阈值发生了变化。图1.14,鲍登线（弹簧）长度变化关于步态周期的曲线也能够佐证这一观点，在较大的拉力作用下，鲍登线整体被拉长了约1cm。 此实验结果强调了对鲍登绳进行最大力矩完全拉伸实验的重要性。关于鲍登绳完全拉伸后的长度与交互力矩关系，后续实验会继续进行研究。</p>
+<table>
+<tr>
+<td>
+<center>
+<img src="https://img-blog.csdnimg.cn/20191020221353229.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+</center>
+<pre><code>    &lt;center&gt;
+    图5 峰值力矩变化时，等效弹簧长度的变化与交互力矩的关系
+    &lt;/center&gt;&lt;/td&gt; 
+&lt;tr&gt;</code></pre>
+</td></tr></table>
 
       
     </div>
@@ -1351,12 +1334,12 @@ Angle_{accel}(k) =\begin{bmatrix} 1 &amp; 0  \end{bmatrix}  \begin{bmatrix} Angl
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
