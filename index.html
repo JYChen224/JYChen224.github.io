@@ -241,7 +241,7 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
 
       
           <p>基于Matlab App Designer设计了一款实验室数据分析软件AIOS，先放几张界面图：</p>
-<p><img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/1.png" alt="主界面"> <img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/2.png" alt="数据加载界面"> <img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/3.png" alt="绘图界面"></p>
+<p><img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/1.png" alt="主界面"><br><img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/2.png" alt="数据加载界面"><br><img src="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/3.png" alt="绘图界面"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/01/30/2.Matlab%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/#more" rel="contents">
@@ -326,11 +326,8 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
       
           <p>PyCosmed数字识别程序回顾与优化。</p>
 <hr>
-<h3 id="图像预处理">图像预处理</h3>
-<p>首先要将截取的图片转为灰度图像，然后绘制灰度直方图，确定二值化阈值<code>150</code>，然后进行二值化：</p>
-<figure>
-<img src="/2020/01/20/3.PyCosmed%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/Figure_1.png" alt="图像预处理"><figcaption>图像预处理</figcaption>
-</figure>
+<h3 id="图像预处理"><a href="#图像预处理" class="headerlink" title="图像预处理"></a>图像预处理</h3><p>首先要将截取的图片转为灰度图像，然后绘制灰度直方图，确定二值化阈值<code>150</code>，然后进行二值化：</p>
+<p><img src="/2020/01/20/3.PyCosmed%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/Figure_1.png" alt="图像预处理"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/01/20/3.PyCosmed%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/#more" rel="contents">
@@ -413,15 +410,16 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="强化学习中逼近函数的相容性问题">强化学习中逼近函数的相容性问题</h2>
-<h4 id="随机性策略的逼近函数相容性">随机性策略的逼近函数相容性</h4>
-<p>对于随机性策略，策略更新的梯度计算公式为： <span class="math display">\[\nabla_\theta J=E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\]</span></p>
-<p>随机性策略逼近函数的相容性条件为：</p>
+          <h2 id="强化学习中逼近函数的相容性问题"><a href="#强化学习中逼近函数的相容性问题" class="headerlink" title="强化学习中逼近函数的相容性问题"></a>强化学习中逼近函数的相容性问题</h2><h4 id="随机性策略的逼近函数相容性"><a href="#随机性策略的逼近函数相容性" class="headerlink" title="随机性策略的逼近函数相容性"></a>随机性策略的逼近函数相容性</h4><p>对于随机性策略，策略更新的梯度计算公式为：</p>
+<script type="math/tex; mode=display">\nabla_\theta J=E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]</script><p>随机性策略逼近函数的相容性条件为：</p>
 <ul>
-<li>[1] <span class="math inline">\(Q^w=\nabla log_\theta\pi_\theta(a|s)^Tw\)</span></li>
-<li>[2] 目标函数为 <span class="math inline">\(\epsilon^2=E[Q_w(s,a)-Q^\pi(s,a)]^2\)</span></li>
+<li>[1] $Q^w=\nabla log_\theta\pi_\theta(a|s)^Tw$ </li>
+<li>[2] 目标函数为 $\epsilon^2=E[Q_w(s,a)-Q^\pi(s,a)]^2$</li>
 </ul>
-<p>证明： 由于<span class="math inline">\(w\)</span>为目标函数的极值，因此有 <span class="math display">\[\frac{\partial\epsilon^2}{\partial w} = E[Q_w(s,a)-Q^\pi(s,a)]\frac{\partial Q_w(s,a)}{\partial w} = 0\]</span> 将条件[1]带入上式得： <span class="math display">\[E[Q_w(s,a)-Q^\pi(s,a)]\nabla log_\theta\pi_\theta(a|s) = 0\]</span> 展开得： <span class="math display">\[E[Q_w(s,a)\nabla log_\theta\pi_\theta(a|s)] = E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]\]</span> 即可得到使用逼近函数进行梯度估计的无偏性</p>
+<p>证明：<br>由于$w$为目标函数的极值，因此有</p>
+<script type="math/tex; mode=display">\frac{\partial\epsilon^2}{\partial w} = E[Q_w(s,a)-Q^\pi(s,a)]\frac{\partial Q_w(s,a)}{\partial w} = 0</script><p>将条件[1]带入上式得：</p>
+<script type="math/tex; mode=display">E[Q_w(s,a)-Q^\pi(s,a)]\nabla log_\theta\pi_\theta(a|s) = 0</script><p>展开得：</p>
+<script type="math/tex; mode=display">E[Q_w(s,a)\nabla log_\theta\pi_\theta(a|s)] = E[Q^\pi(s,a)\nabla log_\theta\pi_\theta(a|s)]</script><p>即可得到使用逼近函数进行梯度估计的无偏性</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/01/07/DDPG/#more" rel="contents">
@@ -504,9 +502,8 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="trpo-trust-region-policy-optimization">TRPO-Trust Region Policy Optimization</h1>
-<h3 id="背景">背景</h3>
-<p>在策略梯度算法中，参数更新的表达式为： <span class="math display">\[\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J\]</span> 在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
+          <h1 id="TRPO-Trust-Region-Policy-Optimization"><a href="#TRPO-Trust-Region-Policy-Optimization" class="headerlink" title="TRPO-Trust Region Policy Optimization"></a>TRPO-Trust Region Policy Optimization</h1><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>在策略梯度算法中，参数更新的表达式为：</p>
+<script type="math/tex; mode=display">\theta_{new} = \theta_{old} + \alpha\nabla_{\theta} J</script><p>在强化学习中使用梯度下降方法进行参数更新时，由于数据集是在交互的过程中不断更新的，因此会遇到如下两个问题：</p>
 <ul>
 <li>梯度估计不准确</li>
 <li>步长参数不容易确定</li>
@@ -594,9 +591,8 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="数据插值">数据插值</h3>
-<hr>
-<p>数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。 使用最多的为三次样条插值。</p>
+          <h3 id="数据插值"><a href="#数据插值" class="headerlink" title="数据插值"></a>数据插值</h3><hr>
+<p>数据插值可分为多项式（高次）插值、分段（低次）插值、三角插值等。多项式插值包括Lagrange插值、Aitken插值、Newton插值、Hermite插值，但高次插值会出现Runge现象，因此更多使用分段低次样条插值。<br>使用最多的为三次样条插值。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">yi = spline(x,y,xi)</span><br><span class="line">pp = spline(x,y)</span><br><span class="line">pp = csape(x,y,conds,valconds)</span><br><span class="line">    valconds: </span><br><span class="line">        'complete'          固定边界条件</span><br><span class="line">        'not-a-knot'        非扭结边界条件（默认）</span><br><span class="line">        'periodic'          周期边界条件</span><br><span class="line">        'second'            自由边界条件</span><br><span class="line">        'variational'       自然边界条件</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
@@ -680,117 +676,20 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="力矩参数扫描实验">力矩参数扫描实验</h2>
-<p>为了进一步理解人如何适应外骨骼助力，我们进行了一系列助力参数扫描实验，研究在助力参数连续改变的过程中，人体运动学、动力学、与生理的变化趋势。在这一系列实验中，我们改变的参数主要为峰值力矩（<span class="math inline">\(20N\cdot m\to60N\cdot m\)</span>）和峰值时间（<span class="math inline">\(44\%\to52\%\)</span>）</p>
+          <h2 id="力矩参数扫描实验"><a href="#力矩参数扫描实验" class="headerlink" title="力矩参数扫描实验"></a>力矩参数扫描实验</h2><p>为了进一步理解人如何适应外骨骼助力，我们进行了一系列助力参数扫描实验，研究在助力参数连续改变的过程中，人体运动学、动力学、与生理的变化趋势。在这一系列实验中，我们改变的参数主要为峰值力矩（$20N\cdot m\to60N\cdot m$）和峰值时间（$44\%\to52\%$）</p>
 <table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020222547375.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图1 期望峰值力矩参数连续变化
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
+    <tr>
+        <td><center>
+        <img src="https://img-blog.csdnimg.cn/20191020222547375.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+        </center>
+        <center>
+        图1 期望峰值力矩参数连续变化
+        </center></td> 
+    </tr><tr>
+</tr></table>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/11/01/W3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/10/01/W1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar2.jpg">
-      <meta itemprop="name" content="JYChen">
-      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JYChen">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/10/01/W1/" class="post-title-link" itemprop="url">W1</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-01T00:00:00+08:00">2019-10-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-01-31 15:31:39" itemprop="dateModified" datetime="2020-01-31T15:31:39+08:00">2020-01-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
-                    <span itemprop="name">数据分析</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="外骨骼硬件优化">1.外骨骼硬件优化</h3>
-对外骨骼的传感系统进行若干改进尝试。 #### 编码器 为外骨骼更换一体式光栅编码器，该编码器精度高（分辨率2000线，最高3600线），价格低（200元），安装方便，受外界干扰小，不会受到外骨骼晃动的影响，不会受到接线不良的影响。建议下一版外骨骼设计时采用磁编码器。 设计了编码器装配外骨骼的3D打印件。由于外骨骼上没有安装孔，所以目前只能用过强力胶将其粘在外骨骼结构上，无法拆卸。
-<table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020210908161.bmp?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图1 一体式光栅编码器
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/10/01/W1/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -870,35 +769,127 @@ color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canv
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="混合控制中的平滑切换问题">混合控制中的平滑切换问题</h3>
-<p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
-<p>如图1所示，在步态状态切换时（65%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
-<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即<span class="math inline">\(vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}\)</span>。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
+          <h3 id="混合控制中的平滑切换问题"><a href="#混合控制中的平滑切换问题" class="headerlink" title="混合控制中的平滑切换问题"></a>混合控制中的平滑切换问题</h3><p>当前的控制策略采取支撑相力矩控制、摆动相角度跟随的混合控制策略，这种策略下的一个重要的问题是如何在两种控制之间进行切换。之前算法中直接在步态周期的65\%时刻直接切换控制模式，这种方式会导致切换瞬间控制器由于过大的误差而产生过大的控制输出，从而使系统存在不稳定的风险。</p>
+<p>如图1所示，在步态状态切换时（65\%的步态周期），由于角度跟踪误差，控制器会产生一个较大控制输出，使得电机控制指令会经历一个跳变。这种跳变的控制信号对于电机而言是不利的，它会降低电机的使用寿命，更极端的会使电机因超过其极限性能而出错。</p>
+<p>在这里我们采用一个非常朴素的解决方法：在两种模式切换时，以滑动比例的方式平滑过渡。在期望力矩下降到0（或者在步态周期达到60%时）进入模式过渡阶段，两种控制策略（力矩与跟随）同时作用，但各自的权重逐渐变化，直到完全变为跟随控制，接着进入摆动阶段跟随控制，即$vel_{cmd}=(1-\alpha)\cdot vel_{torque}+\alpha\cdot vel_{follow}$。经过平滑过渡后的电机控制指令如图3所示，信号跳变问题得到了极大的改善。</p>
 <table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图1 电机控制指令关于步态周期的曲线
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
+    <tr>
+        <td><center>
+        <img src="https://img-blog.csdnimg.cn/20191020220046816.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+        </center>
+        <center>
+        图1 电机控制指令关于步态周期的曲线
+        </center></td> 
+    </tr><tr>
+</tr></table>
+
 <table>
-<tr>
-<td>
-<center>
-<img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
-</center>
-<pre><code>    &lt;center&gt;
-    图2 加入过渡阶段的控制时序
-    &lt;/center&gt;&lt;/td&gt; 
-&lt;tr&gt;</code></pre>
-</td></tr></table>
+    <tr>
+        <td><center>
+        <img src="https://img-blog.csdnimg.cn/2019102022070124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+        </center>
+        <center>
+        图2 加入过渡阶段的控制时序
+        </center></td> 
+    </tr><tr>
+</tr></table>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/10/01/W2/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jychen224.github.io/2019/10/01/W1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar2.jpg">
+      <meta itemprop="name" content="JYChen">
+      <meta itemprop="description" content="欲以究天人之际，通古今之变，成一家之言">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JYChen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/10/01/W1/" class="post-title-link" itemprop="url">W1</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-01T00:00:00+08:00">2019-10-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-31 15:31:39" itemprop="dateModified" datetime="2020-01-31T15:31:39+08:00">2020-01-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="1-外骨骼硬件优化"><a href="#1-外骨骼硬件优化" class="headerlink" title="1.外骨骼硬件优化"></a>1.外骨骼硬件优化</h3><p>对外骨骼的传感系统进行若干改进尝试。</p>
+<h4 id="编码器"><a href="#编码器" class="headerlink" title="编码器"></a>编码器</h4><p>为外骨骼更换一体式光栅编码器，该编码器精度高（分辨率2000线，最高3600线），价格低（200元），安装方便，受外界干扰小，不会受到外骨骼晃动的影响，不会受到接线不良的影响。建议下一版外骨骼设计时采用磁编码器。<br>设计了编码器装配外骨骼的3D打印件。由于外骨骼上没有安装孔，所以目前只能用过强力胶将其粘在外骨骼结构上，无法拆卸。</p>
+<table>
+    <tr>
+        <td><center>
+        <img src="https://img-blog.csdnimg.cn/20191020210908161.bmp?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MDA3NTQw,size_16,color_FFFFFF,t_70">
+        </center>
+        <center>
+        图1 一体式光栅编码器
+        </center></td> 
+    </tr><tr>
+</tr></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/10/01/W1/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
